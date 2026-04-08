@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Quiz Generator | Turn PDFs into MCQs</title>
+    <!-- SEO Best Practices -->
+    <meta name="description" content="AI-powered tool that automatically generates Multiple Choice Questions from your uploaded PDF notes and study materials.">
+    <!-- Font Awesome for quick icons without npm -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <h1>Quizify AI</h1>
+            <p class="subtitle">Transform your study materials into interactive quizzes instantly.</p>
+        </header>
+
+        <!-- UPLOAD SECTION -->
+        <main class="glass-panel" id="upload-view">
+            <div class="upload-area" id="drop-zone" onclick="document.getElementById('file-input').click()">
+                <i class="fa-solid fa-file-pdf upload-icon"></i>
+                <div class="upload-text">Drag & drop your PDF here</div>
+                <div class="upload-hint">or click to browse files</div>
+                <input type="file" id="file-input" accept="application/pdf,.txt" />
+            </div>
+        </main>
+
+        <!-- LOADING SECTION -->
+        <main class="glass-panel" id="loading-view">
+            <div class="spinner-wrapper">
+                <div class="spinner"></div>
+            </div>
+            <div class="pulse-text" id="loading-text">Analyzing document...</div>
+            <p class="upload-hint" style="margin-top: 1rem;">Our AI is extracting text and generating questions.</p>
+        </main>
+
+        <!-- QUIZ SECTION -->
+        <main class="glass-panel" id="quiz-view">
+            <div class="question-header">
+                <div class="question-count">Question <span id="current-q-num">1</span> of <span id="total-q-num">5</span></div>
+                <div class="score-display">Score: <span id="score-val">0</span></div>
+            </div>
+            
+            <div class="question-text" id="question-text">
+                Loading question...
+            </div>
+            
+            <div class="options-grid" id="options-container">
+                <!-- Options will be injected here via JS -->
+            </div>
+
+            <div class="action-bar">
+                <button class="btn-primary" id="next-btn" disabled>Next Question <i class="fa-solid fa-arrow-right" style="margin-left: 8px;"></i></button>
+            </div>
+        </main>
+
+        <!-- RESULTS SECTION -->
+        <main class="glass-panel hidden" id="results-view" style="text-align: center;">
+            <i class="fa-solid fa-trophy" style="font-size: 4rem; color: #fbbf24; margin-bottom: 1rem;"></i>
+            <h2 style="font-size: 2rem; margin-bottom: 1rem;">Quiz Completed!</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 2rem;">You scored <strong id="final-score">0</strong> out of <strong id="final-total">0</strong>.</p>
+            <button class="btn-primary" onclick="location.reload()">Create Another Quiz</button>
+        </main>
+
+        <div class="watermark">-bt aswin ramesh</div>
+
+    </div>
+
+    <!-- PDF.js library for client-side parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        // Set the worker path for PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    <script src="./app.js"></script>
+</body>
+</html>
