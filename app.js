@@ -232,3 +232,100 @@ function showView(viewName) {
         }
     }
 }
+
+// ==========================================
+// Visual Effects
+// ==========================================
+
+// 1. Premium Cursor & Background Interpolation
+const cursorGlow = document.getElementById('cursor-glow');
+
+let mouseX = window.innerWidth / 2;
+let mouseY = window.innerHeight / 2;
+let glowX = mouseX;
+let glowY = mouseY;
+let isHovering = false;
+
+document.addEventListener('mousemove', (e) => {
+    isHovering = true;
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+});
+
+document.addEventListener('mouseleave', () => {
+    isHovering = false;
+    document.body.style.backgroundImage = ''; // resets back to default effortlessly
+    
+    // reset panel tilts
+    document.querySelectorAll('.glass-panel:not(.hidden)').forEach(panel => {
+        panel.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)`;
+    });
+});
+
+function animatePremiumEffects() {
+    // Lerp (Linear Interpolation) for buttery smooth cursor trail lag
+    glowX += (mouseX - glowX) * 0.08; 
+    glowY += (mouseY - glowY) * 0.08;
+
+    if (cursorGlow) {
+        cursorGlow.style.opacity = isHovering ? '1' : '0';
+        cursorGlow.style.left = glowX + 'px';
+        cursorGlow.style.top = glowY + 'px';
+    }
+
+    if (isHovering) {
+        // Fluid entire page background shift based on the smoothed coordinates
+        const x = (glowX / window.innerWidth) * 100;
+        const y = (glowY / window.innerHeight) * 100;
+        
+        document.body.style.backgroundImage = `
+            radial-gradient(circle at ${x}% ${y}%, rgba(139, 92, 246, 0.25), transparent 45%),
+            radial-gradient(circle at ${100 - x}% ${100 - y}%, rgba(56, 189, 248, 0.25), transparent 50%),
+            radial-gradient(circle at ${y}% ${x}%, rgba(236, 72, 153, 0.15), transparent 60%)
+        `;
+        
+        // Dynamic 3D tilt on active glass panels giving a premium glassmorphic depth
+        document.querySelectorAll('.glass-panel:not(.hidden)').forEach(panel => {
+            const rect = panel.getBoundingClientRect();
+            const panelCenterX = rect.left + rect.width / 2;
+            const panelCenterY = rect.top + rect.height / 2;
+            
+            // max rotation tilt calculation
+            const tiltX = (panelCenterY - glowY) / 40; 
+            const tiltY = (glowX - panelCenterX) / 40;
+            
+            panel.style.transform = `perspective(1500px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateY(-2px)`;
+        });
+    }
+    
+    requestAnimationFrame(animatePremiumEffects);
+}
+
+// Start the elegant animation loop
+animatePremiumEffects();
+
+// 2. Button Ripple Effect
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    
+    // Prevent creating multiple ripples too quickly
+    const existingRipple = btn.querySelector('.ripple');
+    if (existingRipple) {
+        existingRipple.remove();
+    }
+    
+    const circle = document.createElement('span');
+    const diameter = Math.max(btn.clientWidth, btn.clientHeight);
+    const radius = diameter / 2;
+    
+    // Get button's position relative to the viewport
+    const rect = btn.getBoundingClientRect();
+    
+    circle.style.width = circle.style.height = `${diameter}px`;
+    circle.style.left = `${e.clientX - rect.left - radius}px`;
+    circle.style.top = `${e.clientY - rect.top - radius}px`;
+    circle.classList.add('ripple');
+    
+    btn.appendChild(circle);
+});
