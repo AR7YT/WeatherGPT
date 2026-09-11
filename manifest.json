@@ -1,4 +1,5 @@
 {
+  "id": "weathergpt-ai-meteorologist",
   "name": "WeatherGPT — AI Meteorologist",
   "short_name": "WeatherGPT",
   "description": "Conversational AI for Real-Time Weather Forecasting, Alerts, Air Quality & Manglish Dialogue with Gemini 3.6",
@@ -9,6 +10,8 @@
   "background_color": "#0b0f19",
   "theme_color": "#0b0f19",
   "lang": "en",
+  "dir": "ltr",
+  "prefer_related_applications": false,
   "categories": ["weather", "utilities", "productivity"],
   "icons": [
     {
@@ -34,6 +37,32 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Kochi Weather & Alerts",
+      "short_name": "Kochi",
+      "description": "Check real-time weather and rain alerts for Kochi, Kerala",
+      "url": "./index.html",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Weather Radar Map",
+      "short_name": "Radar",
+      "description": "Open interactive live precipitation radar",
+      "url": "./index.html",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }
