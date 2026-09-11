@@ -68,6 +68,37 @@ const KERALA_CITY_ALIASES = {
     'kasargod': 'Kasaragod'
 };
 
+// Pinned high-accuracy coordinates for Kerala locations (ensures Kochi is Kerala, India — never Japan!)
+const PINNED_KERALA_LOCATIONS = {
+    'kochi': { name: 'Kochi', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 9.9399, longitude: 76.2602, elevation: 4, timezone: 'Asia/Kolkata' },
+    'cochin': { name: 'Kochi', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 9.9399, longitude: 76.2602, elevation: 4, timezone: 'Asia/Kolkata' },
+    'ernakulam': { name: 'Kochi (Ernakulam)', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 9.9816, longitude: 76.2999, elevation: 4, timezone: 'Asia/Kolkata' },
+    'thiruvananthapuram': { name: 'Thiruvananthapuram', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 8.5241, longitude: 76.9366, elevation: 10, timezone: 'Asia/Kolkata' },
+    'trivandrum': { name: 'Thiruvananthapuram', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 8.5241, longitude: 76.9366, elevation: 10, timezone: 'Asia/Kolkata' },
+    'tvm': { name: 'Thiruvananthapuram', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 8.5241, longitude: 76.9366, elevation: 10, timezone: 'Asia/Kolkata' },
+    'kozhikode': { name: 'Kozhikode', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 11.2588, longitude: 75.7804, elevation: 1, timezone: 'Asia/Kolkata' },
+    'calicut': { name: 'Kozhikode', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 11.2588, longitude: 75.7804, elevation: 1, timezone: 'Asia/Kolkata' },
+    'clt': { name: 'Kozhikode', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 11.2588, longitude: 75.7804, elevation: 1, timezone: 'Asia/Kolkata' },
+    'thrissur': { name: 'Thrissur', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 10.5276, longitude: 76.2144, elevation: 2, timezone: 'Asia/Kolkata' },
+    'trichur': { name: 'Thrissur', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 10.5276, longitude: 76.2144, elevation: 2, timezone: 'Asia/Kolkata' },
+    'alappuzha': { name: 'Alappuzha', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 9.4981, longitude: 76.3388, elevation: 1, timezone: 'Asia/Kolkata' },
+    'alleppey': { name: 'Alappuzha', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 9.4981, longitude: 76.3388, elevation: 1, timezone: 'Asia/Kolkata' },
+    'alp': { name: 'Alappuzha', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 9.4981, longitude: 76.3388, elevation: 1, timezone: 'Asia/Kolkata' },
+    'kollam': { name: 'Kollam', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 8.8932, longitude: 76.6141, elevation: 3, timezone: 'Asia/Kolkata' },
+    'quilon': { name: 'Kollam', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 8.8932, longitude: 76.6141, elevation: 3, timezone: 'Asia/Kolkata' },
+    'palakkad': { name: 'Palakkad', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 10.7867, longitude: 76.6548, elevation: 84, timezone: 'Asia/Kolkata' },
+    'palghat': { name: 'Palakkad', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 10.7867, longitude: 76.6548, elevation: 84, timezone: 'Asia/Kolkata' },
+    'kannur': { name: 'Kannur', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 11.8745, longitude: 75.3704, elevation: 14, timezone: 'Asia/Kolkata' },
+    'cannanore': { name: 'Kannur', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 11.8745, longitude: 75.3704, elevation: 14, timezone: 'Asia/Kolkata' },
+    'kottayam': { name: 'Kottayam', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 9.5916, longitude: 76.5222, elevation: 3, timezone: 'Asia/Kolkata' },
+    'malappuram': { name: 'Malappuram', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 11.0510, longitude: 76.0711, elevation: 40, timezone: 'Asia/Kolkata' },
+    'wayanad': { name: 'Wayanad (Kalpetta)', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 11.6050, longitude: 76.0829, elevation: 780, timezone: 'Asia/Kolkata' },
+    'idukki': { name: 'Idukki (Painavu)', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 9.8494, longitude: 76.9806, elevation: 650, timezone: 'Asia/Kolkata' },
+    'munnar': { name: 'Munnar', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 10.0889, longitude: 77.0595, elevation: 1532, timezone: 'Asia/Kolkata' },
+    'kasaragod': { name: 'Kasaragod', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 12.4996, longitude: 74.9869, elevation: 12, timezone: 'Asia/Kolkata' },
+    'pathanamthitta': { name: 'Pathanamthitta', admin1: 'Kerala', country: 'India', country_code: 'IN', latitude: 9.2648, longitude: 76.7870, elevation: 18, timezone: 'Asia/Kolkata' }
+};
+
 // ============================================================================
 // APPLICATION STATE
 // ============================================================================
@@ -289,15 +320,57 @@ class WeatherService {
             // 2. Clean query and check aliases
             let cleanQuery = query.replace(/[?!.]/g, '').trim();
             const lowerQuery = cleanQuery.toLowerCase();
-            if (KERALA_CITY_ALIASES[lowerQuery]) {
-                cleanQuery = KERALA_CITY_ALIASES[lowerQuery];
+            const isJapanExplicit = lowerQuery.includes('japan') || lowerQuery.includes('jp');
+
+            // 2a. Check if directly in pinned Kerala locations (100% guarantees Kochi is in Kerala, India)
+            const strippedForPinned = lowerQuery.replace(/\b(weather|in|at|for|climate|mazha|choodu|forecast|kerala|city|town)\b/g, '').trim();
+            if (!isJapanExplicit) {
+                if (PINNED_KERALA_LOCATIONS[lowerQuery]) {
+                    return { ...PINNED_KERALA_LOCATIONS[lowerQuery] };
+                }
+                if (PINNED_KERALA_LOCATIONS[strippedForPinned]) {
+                    return { ...PINNED_KERALA_LOCATIONS[strippedForPinned] };
+                }
             }
 
-            // 3. Geocoding search via Open-Meteo
-            const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cleanQuery)}&count=5&language=en&format=json`);
+            if (KERALA_CITY_ALIASES[lowerQuery]) {
+                cleanQuery = KERALA_CITY_ALIASES[lowerQuery];
+            } else if (KERALA_CITY_ALIASES[strippedForPinned]) {
+                cleanQuery = KERALA_CITY_ALIASES[strippedForPinned];
+            }
+
+            // 3. Geocoding search via Open-Meteo with count=10
+            const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cleanQuery)}&count=10&language=en&format=json`);
             if (!res.ok) throw new Error('Geocoding service unavailable');
             const data = await res.json();
             if (!data.results || data.results.length === 0) return null;
+
+            // 3a. Disambiguation: if query is Kochi or Kerala-related and NOT explicit Japan, prioritize Kerala/India
+            if (isJapanExplicit) {
+                const japanMatch = data.results.find(r => r.country_code === 'JP' || r.country === 'Japan');
+                if (japanMatch) return japanMatch;
+            } else {
+                // Priority 1: Match in Kerala, India
+                const keralaMatch = data.results.find(r => 
+                    (r.country_code === 'IN' || r.country === 'India') && 
+                    (r.admin1 === 'Kerala' || (r.name && r.name.toLowerCase() === 'kochi'))
+                );
+                if (keralaMatch) {
+                    return {
+                        ...keralaMatch,
+                        name: keralaMatch.name === 'Kōchi' ? 'Kochi' : keralaMatch.name,
+                        admin1: 'Kerala',
+                        country: 'India'
+                    };
+                }
+
+                // Priority 2: Match in India for Kochi/Cochin queries
+                if (lowerQuery.includes('kochi') || lowerQuery.includes('cochin')) {
+                    const indiaMatch = data.results.find(r => r.country_code === 'IN' || r.country === 'India');
+                    if (indiaMatch) return indiaMatch;
+                }
+            }
+
             return data.results[0];
         } catch (err) {
             console.error('Geocoding error:', err);
@@ -339,102 +412,153 @@ class WeatherService {
 // ============================================================================
 
 class AlertDetector {
-    static detect(weatherData, aqiData, units) {
+    static detect(weatherData, aqiData, units, isManglish = false) {
         const alerts = [];
         const current = weatherData.current;
         const daily = weatherData.daily;
         const isImperial = units === 'imperial';
-
-        // 1. Extreme Heat Alert
-        const maxTemp = isImperial ? 100 : 38;
+        const tempUnit = isImperial ? '°F' : '°C';
         const currentTemp = current.temperature_2m;
         const feelsLike = current.apparent_temperature;
-        const heatThreshold = isImperial ? 104 : 40;
+        const rainProb = daily && daily.precipitation_probability_max ? daily.precipitation_probability_max[0] : 0;
+        const uv = daily && daily.uv_index_max ? daily.uv_index_max[0] : (current.uv_index || 0);
+        const wind = Math.round(current.wind_speed_10m);
+        const windUnit = isImperial ? 'mph' : 'km/h';
+        const wmoCode = current.weather_code;
 
-        if (feelsLike >= heatThreshold || currentTemp >= maxTemp) {
+        // 1. FRIENDLY & FUNNY RAIN / UMBRELLA ALERT 🌧️
+        const isCurrentlyRaining = [51, 53, 55, 56, 57, 61, 63, 65, 80, 81, 82].includes(wmoCode) || current.precipitation > 0;
+        if (isCurrentlyRaining || rainProb >= 40) {
+            const highProb = rainProb >= 70 || isCurrentlyRaining;
             alerts.push({
-                level: 'warning',
-                badge: 'Extreme Heat Warning',
-                icon: 'fa-temperature-arrow-up',
-                title: 'High Heat & Thermal Strain Advisory',
-                desc: `Dangerous heat index of ${Math.round(feelsLike)}°${isImperial ? 'F' : 'C'}. High risk of heat exhaustion and dehydration.`,
-                safety: [
-                    'Avoid prolonged outdoor exertion between 11:00 AM and 4:00 PM.',
-                    'Stay hydrated with electrolytes and seek air-conditioned environments.',
-                    'Never leave children or pets in closed vehicles.'
+                level: 'funny-rain',
+                badge: isCurrentlyRaining ? '🌧️ Mazha Pothiyunnu!' : (highProb ? '☔ High Rain Chance!' : '🌦️ Rain Watch'),
+                icon: 'fa-cloud-showers-heavy',
+                title: isManglish
+                    ? (isCurrentlyRaining ? 'Mazha Peithu Thudangi! Kuda Ready Aakko!' : `Mazha Alert: ${rainProb}% Sadyatha Undu!`)
+                    : (isCurrentlyRaining ? 'Active Rainfall in Progress! Grab Cover!' : `Rain Alert: ${rainProb}% Chance of Showers`),
+                desc: isManglish
+                    ? `Ayalathe thuni ippo thanne edutholoo! Mazha nanayan **${rainProb}%** nalla chance undu. Kuda marannal kulichu thorthi varandi varum! 😂 Nalla choodu chayayum parippuvadakkum pattiya samayam.`
+                    : `Don't let your laundry dry outside unless you want it washed twice! 😂 Peak rain probability is **${rainProb}%**. Keep an umbrella handy or prepare for an impromptu monsoon dance!`,
+                safety: isManglish ? [
+                    'Oru kuda (umbrella) eppozhum kayyil karuthikkoloo! 🌂',
+                    'Two-wheeleril pokunnavar raincoat marakkalle.',
+                    'Vellakkettum vazhukkumulla road-ukalil shradhichu vandi odikkuka.'
+                ] : [
+                    'Carry a trusty umbrella or packable raincoat ☔',
+                    'Watch out for slippery pavement and waterlogged roads',
+                    'Perfect excuse to stay indoors with hot coffee or chai ☕'
                 ]
             });
         }
 
-        // 2. Severe Thunderstorm & Hail Warning
-        if ([95, 96, 99].includes(current.weather_code)) {
-            const isSevereHail = current.weather_code === 99;
+        // 2. FRIENDLY & FUNNY "VERY SUN" / SCORCHER HEAT ALERT ☀️
+        const heatThreshold = isImperial ? 88 : 31;
+        const feelsThreshold = isImperial ? 93 : 34;
+        const isVerySunny = [0, 1].includes(wmoCode) && (currentTemp >= heatThreshold || feelsLike >= feelsThreshold || uv >= 6);
+
+        if (isVerySunny || feelsLike >= (isImperial ? 100 : 38)) {
+            const isExtreme = feelsLike >= (isImperial ? 104 : 40);
             alerts.push({
-                level: 'warning',
-                badge: isSevereHail ? 'Severe Storm & Hail Warning' : 'Thunderstorm Alert',
-                icon: 'fa-cloud-bolt',
-                title: isSevereHail ? 'Severe Hail & Intense Lightning Hazard' : 'Active Thunderstorm Observed',
-                desc: `Dangerous electrical activity detected with wind gusts up to ${Math.round(current.wind_gusts_10m || current.wind_speed_10m)} ${isImperial ? 'mph' : 'km/h'}.`,
-                safety: [
-                    'Seek substantial indoor shelter immediately; avoid trees or open fields.',
-                    'Disconnect sensitive electronic equipment.',
-                    'Stay away from windows and do not drive through flooded roadways.'
+                level: 'funny-sun',
+                badge: isExtreme ? '🔥 Extreme Heatwave Alert!' : '☀️ Katta Choodu Alert!',
+                icon: 'fa-sun',
+                title: isManglish
+                    ? (isExtreme ? 'Katta Choodu Warning! Sooryan Formil Aanu!' : 'Nalla Veyil & Choodu Alert! (Biryani Mode)')
+                    : (isExtreme ? 'Extreme Heat Index Warning!' : 'Sizzling Sun Alert! (The Sun is Cooking)'),
+                desc: isManglish
+                    ? `Sooryan nalla kathi nilkkukayaanu! Current temperature **${Math.round(currentTemp)}${tempUnit}** undu (feels like **${Math.round(feelsLike)}${tempUnit}**). Naranga vellavum karikkum kudicho, allenkil porinju mezhukkupuratti aakum! 😎🥥`
+                    : `It is blazing hot outside! The air feels like **${Math.round(feelsLike)}${tempUnit}** with UV index at **${Math.round(uv)}**. Drink coconut water and stay hydrated before you melt like ice cream! 🍹🍦`,
+                safety: isManglish ? [
+                    'Dharalam nannari sarbatho lime juice-o kudikkuka 🍋',
+                    'Sun glasses, cap & light cotton dress use cheyyuka 🕶️',
+                    'Uchakku 12:00 PM muthal 3:00 PM vare veyilathu kooduthal nilkaruthu.'
+                ] : [
+                    'Chug cold water and electrolytes like it’s your job 💧',
+                    'Wear UV-rated sunglasses, sunscreen & breathable cotton clothing 🕶️',
+                    'Seek air conditioning and shade during peak afternoon hours 🌴'
                 ]
             });
         }
 
-        // 3. Gale Force Wind Alert
-        const galeThreshold = isImperial ? 38 : 60; // mph or km/h
-        const gustThreshold = isImperial ? 50 : 80;
-        const currentWind = current.wind_speed_10m;
-        const currentGusts = current.wind_gusts_10m || currentWind;
+        // 3. THUNDERSTORM & LIGHTNING ALERT ⚡
+        if ([95, 96, 99].includes(wmoCode)) {
+            const isSevereHail = wmoCode === 99;
+            alerts.push({
+                level: 'funny-thunder',
+                badge: isSevereHail ? '🚨 Severe Hail & Thunder Alert' : '⚡ Minnal & Idi Alert!',
+                icon: 'fa-bolt-lightning',
+                title: isManglish ? 'Minnal Murali Mode: Idiyum Minnalum!' : 'Thor is Visiting: Lightning & Thunder Alert!',
+                desc: isManglish
+                    ? `Aakashathu nalla idi-minnal vedikkettu thudangi! Wind speed **${wind} ${windUnit}** undu. Thenginte chottil nilkkaruthu, phone charge cheyyunnathum TV-yum off cheytho! ⚡`
+                    : `Dangerous electrical atmospheric discharge in progress with gusts up to **${wind} ${windUnit}**! Disconnect delicate gaming consoles and step inside immediately! 🎮⚡`,
+                safety: isManglish ? [
+                    'Marangalkko thengukalkko chuvattil nilkaruthu 🌴',
+                    'TV, computer, fridge muthalaya appliances unplug cheyyuka 🔌',
+                    'Idiyulla samayathu kulikkunnathum kooduthal vellathil nilkkunnathum ozhivakkuka.'
+                ] : [
+                    'Seek indoor shelter immediately; avoid solitary tall trees',
+                    'Unplug sensitive electronics and PCs to prevent power surges 🔌',
+                    'Avoid open rooftops and metal structures during electrical storms'
+                ]
+            });
+        }
 
-        if (currentWind >= galeThreshold || currentGusts >= gustThreshold) {
+        // 4. GALE FORCE WINDS 🌬️
+        const galeThreshold = isImperial ? 35 : 55;
+        if (wind >= galeThreshold) {
             alerts.push({
                 level: 'watch',
-                badge: 'Gale Wind Warning',
+                badge: '🌬️ Shakthamaya Kaattu Alert',
                 icon: 'fa-wind',
-                title: 'High Velocity Winds & Tree Hazard',
-                desc: `Sustained winds of ${Math.round(currentWind)} ${isImperial ? 'mph' : 'km/h'} with severe gusts up to ${Math.round(currentGusts)} ${isImperial ? 'mph' : 'km/h'}.`,
-                safety: [
-                    'Secure loose outdoor furniture, umbrellas, and garbage receptacles.',
-                    'Exercise extreme caution when driving high-profile vehicles.',
-                    'Watch for fallen powerlines and falling tree limbs.'
+                title: isManglish ? 'Flying Cap Alert: Nalla Shakthamaya Kaattu!' : 'High Velocity Wind & Gust Warning',
+                desc: isManglish
+                    ? `Nalla vegamulla kaattu (**${wind} ${windUnit}**) veeshunnu! Kuda thurannekkalle, marichu thiriyum! Thoppiyum thuniyum parannu pokathe nokkikko! 🧢💨`
+                    : `Brisk winds gusting at **${wind} ${windUnit}**! Hold onto your hats, umbrellas, and lawn furniture! 🧢💨`,
+                safety: isManglish ? [
+                    'Balcony-le thunikalum cheruppukalum eduthu vekkuka',
+                    'Road-il marangal veezhan chance ullathukondu shradhikkuka'
+                ] : [
+                    'Secure loose patio items, bins, and umbrellas',
+                    'Exercise extra caution while driving high-profile vehicles'
                 ]
             });
         }
 
-        // 4. Freezing / Ice Risk
-        const freezeThreshold = isImperial ? 32 : 0;
-        if (currentTemp <= freezeThreshold && (current.precipitation > 0 || [56, 57, 66, 67, 71, 73, 75].includes(current.weather_code))) {
-            alerts.push({
-                level: 'watch',
-                badge: 'Freezing Road & Ice Warning',
-                icon: 'fa-snowflake',
-                title: 'Black Ice & Glaze Hazards',
-                desc: `Sub-freezing temperatures (${Math.round(currentTemp)}°${isImperial ? 'F' : 'C'}) combined with moisture create invisible black ice conditions.`,
-                safety: [
-                    'Significantly reduce driving speeds and increase braking distance.',
-                    'Wrap outdoor exposed plumbing and pipes to prevent freezing bursts.',
-                    'Wear insulated non-slip footwear to prevent slips and falls.'
-                ]
-            });
-        }
-
-        // 5. Air Quality Hazard
-        if (aqiData && aqiData.current && aqiData.current.us_aqi >= 151) {
+        // 5. AIR QUALITY ADVISORY 😷
+        if (aqiData && aqiData.current && aqiData.current.us_aqi >= 150) {
             const aqi = aqiData.current.us_aqi;
-            const isHazardous = aqi >= 250;
             alerts.push({
-                level: isHazardous ? 'warning' : 'advisory',
-                badge: isHazardous ? 'Hazardous Air Warning' : 'Poor Air Quality Advisory',
+                level: 'warning',
+                badge: '😷 High AQI Pollution Advisory',
                 icon: 'fa-mask-ventilator',
-                title: `US AQI index measured at ${aqi} (Unhealthy)`,
-                desc: `Elevated particulate matter (PM2.5 / PM10) concentrations pose respiratory and cardiovascular health risks.`,
+                title: isManglish ? `AQI Index ${aqi} (Unhealthy Air)` : `Air Quality Index Measured at ${aqi}`,
+                desc: isManglish
+                    ? `Vayuvil kooduthal dhoosheekaranam (PM2.5) undu. Shwasakosha prashnangallullavar purathottu irangumbol N95 mask dharikkuka.`
+                    : `Elevated particulate matter (PM2.5) detected. Vulnerable individuals should wear an N95 mask when outdoors.`,
                 safety: [
-                    'Wear an N95/KF94 mask when outdoors.',
-                    'Keep windows closed and operate indoor HEPA air purifiers.',
-                    'Vulnerable groups (children, elderly, asthma patients) should remain indoors.'
+                    'Wear an N95 or KN95 protective mask outdoors',
+                    'Keep windows shut and operate indoor air filters if available'
+                ]
+            });
+        }
+
+        // 6. PLEASANT WEATHER VIBE CHECK 🍃 (When no negative alerts)
+        if (alerts.length === 0 && currentTemp >= (isImperial ? 68 : 20) && currentTemp <= (isImperial ? 84 : 29) && rainProb <= 25) {
+            alerts.push({
+                level: 'funny-vibe',
+                badge: '✨ 10/10 Climate Vibe Check',
+                icon: 'fa-mug-hot',
+                title: isManglish ? 'Chaya & Parippuvada Weather! ☕' : 'Officially Certified 10/10 Weather! 🌿',
+                desc: isManglish
+                    ? `Sughakaramaya weather aanu (**${Math.round(currentTemp)}${tempUnit}**). Choodum thanuppum alpamilla, kidilan breeze undu. Oru choodu chayayum kazhichu chill cheyyaan pattiya best samayam! ☕🍪`
+                    : `Pleasant **${Math.round(currentTemp)}${tempUnit}** with gentle breeze and calm skies. Go outside, take a walk, or sip coffee like a movie protagonist! 🎬☕`,
+                safety: isManglish ? [
+                    'Yathrakko walk-ino povan pattiya nalla samayam! 🚶',
+                    'Enjoy the pleasant breeze!'
+                ] : [
+                    'Great conditions for running, cycling, or outdoor dining 🚲',
+                    'Take a break and soak in the natural daylight ☀️'
                 ]
             });
         }
@@ -523,6 +647,23 @@ class WeatherGPTEngine {
 
     static detectIntent(prompt) {
         const lower = prompt.toLowerCase();
+        const trimmed = lower.replace(/[?!.,;]/g, '').trim();
+
+        // 0a. Greetings & Casual Openers (English + Manglish)
+        const greetings = ['hi', 'hello', 'hey', 'good morning', 'good evening', 'good afternoon', 'namaskaram', 'sughamano', 'enthokke undu', 'vishesham', 'hlo', 'hai', 'helo', 'morning', 'hola'];
+        if (greetings.includes(trimmed) || ((trimmed.startsWith('hi ') || trimmed.startsWith('hello ') || trimmed.startsWith('hey ') || trimmed.startsWith('namaskaram ')) && trimmed.split(/\s+/).length <= 2)) {
+            return { type: 'greeting', query: prompt };
+        }
+
+        // 0b. Identity & Capabilities
+        if (lower.includes('who are you') || lower.includes('what are you') || lower.includes('what can you do') || lower.includes('naru aanu') || lower.includes('help me') || lower.includes('enthokke cheyyam')) {
+            return { type: 'identity', query: prompt };
+        }
+
+        // 0c. Jokes & Humor
+        if (lower.includes('joke') || lower.includes('chali') || lower.includes('funny') || lower.includes('comedy') || lower.includes('chirikkan')) {
+            return { type: 'joke', query: prompt };
+        }
 
         // 1. Climate Science Inquiry
         for (let key in CLIMATE_KNOWLEDGE) {
@@ -730,8 +871,15 @@ ${city.name}-le adutha 7 divasathe weather report:
         let chooduText = temp >= 32 ? "Nalla choodum humidity-yum undu" : (temp <= 22 ? "Cheriya thanuppulla nalla climate aanu" : "Sughakaramaya climate aanu");
         let mazhaText = rainProb >= 50 ? `Mazha peyyan **${rainProb}%** nalla chance undu` : (rainProb >= 20 ? `Cheriya charal mazha aayekkam (${rainProb}%)` : `Mazha peyyan valiya sadyatha illa (${rainProb}%)`);
 
-        return `### 🌤️ **Atmospheric Briefing: ${city.name}**
-Aliya, **${city.name}**-yil ippo **${temp}${tempUnit}** aanu temperature. Feels like **${feelsLike}${tempUnit}**.
+        let alertHighlight = "";
+        if (alerts && alerts.length > 0) {
+            alertHighlight = `\n> **${alerts[0].badge}**: ${alerts[0].desc}\n`;
+        }
+
+        const locationName = `${city.name}${city.admin1 && city.admin1 !== city.name ? ', ' + city.admin1 : ''}`;
+
+        return `### 🌤️ **Atmospheric Briefing: ${locationName}**
+${alertHighlight}Aliya, **${city.name}**-yil ippo **${temp}${tempUnit}** aanu temperature. Feels like **${feelsLike}${tempUnit}**.
 * **Condition**: *${wmo.descMl}* (${wmo.desc})
 * **Choodu**: ${chooduText} (Humidity: **${humidity}%**).
 * **Mazha Update**: ${mazhaText}.
@@ -786,7 +934,7 @@ class UIRenderer {
                 <div class="location-meta">
                     <h3>
                         <i class="fa-solid fa-location-dot text-blue"></i>
-                        <span>${city.name}${city.country ? ', ' + city.country : ''}</span>
+                        <span>${city.name}${city.admin1 && city.admin1 !== city.name ? ', ' + city.admin1 : ''}${city.country ? ', ' + city.country : ''}</span>
                     </h3>
                     <div class="location-subtext">
                         <span>${UIRenderer.formatLocalTime(cur.time, weatherData.timezone)}</span>
@@ -1391,6 +1539,68 @@ class ChatManager {
         const isManglish = WeatherGPTEngine.isManglish(query);
         const intent = WeatherGPTEngine.detectIntent(query);
 
+        // 0a. GREETINGS & CASUAL OPENERS
+        if (intent.type === 'greeting') {
+            const greetingNarrative = isManglish
+                ? `### Namaskaram Aliya! 👋🌴
+Ivide njan 24x7 real-time satellite radar-um numerical weather prediction models-um monitor cheyyukayaanu.
+
+* 📍 **Etha ninte sthalam?** Kochi, Trivandrum, Kozhikode, Wayanad, or vere ethenkilum sthalathe weather report veno?
+* 🌧️ **Mazhayundo?** *"Kochi-yil innu mazha peyyumo?"*, *"Trivandrum choodano?"* ennu direct aayi chodhicho!
+* ⚡ **100% Free**: API key onnum type cheyyenda, direct aayi use cheyyam!
+
+Etha sthalam nokkendathu? Chodhicho! 😊`
+                : `### Hello there! 👋🌤️
+I am **WeatherGPT**, your friendly conversational AI meteorologist! I'm monitoring global NWP atmospheric telemetry in real-time.
+
+* 📍 **Any location worldwide**: e.g., *"Kochi weather"*, *"Tokyo 7-day forecast"*, *"Will it rain in London?"*
+* ☀️ **Friendly & Funny Alerts**: Ask *"Is it too hot outside?"* or *"Will it rain today?"*
+* ⚡ **100% Free & Ready**: Zero API key or configuration required for anyone!
+
+Which city would you like to check today?`;
+
+            this.addAssistantMessage(greetingNarrative, [], isManglish);
+            return;
+        }
+
+        // 0b. IDENTITY & CAPABILITIES
+        if (intent.type === 'identity') {
+            const identityNarrative = isManglish
+                ? `### 🤖 Njan aanu WeatherGPT!
+Njan oru Conversational AI Meteorologist aanu. Kerala-yileyum global aayumulla ella sthalangalile live weather, mazha sadyatha, katta choodu alerts, air quality (AQI), interactive radar map enniva njan analyse cheythu parayum!
+
+* 🌴 **Natural Manglish**: Malayalam transliterated script-il natural aayi സംസാരിക്കാം.
+* ⚡ **Zero API Key Needed**: Ellavarkkum eppozhum free aayi ready out-of-the-box!
+* 📍 **Accurate Kerala Locations**: Kochi, Trivandrum, Kozhikode, Thrissur, Wayanad muthalaya ella sthalangalum 100% accurate aayi pinpoint cheyyum.`
+                : `### 🤖 I am WeatherGPT!
+A world-class conversational AI meteorologist powered by real-time Open-Meteo European ECMWF, GFS, and ICON numerical weather prediction models.
+
+* 🌍 **Global & Hyper-Local**: Real-time hourly curves, 7-day forecasts, severe storm alerts, and radar maps.
+* 🌴 **Natural Manglish & English**: Ask in natural Malayalam-English or standard English.
+* ⚡ **Zero API Key Required**: Fully accessible and free for everyone instantly!`;
+
+            this.addAssistantMessage(identityNarrative, [], isManglish);
+            return;
+        }
+
+        // 0c. JOKES & HUMOR
+        if (intent.type === 'joke') {
+            const jokesMl = [
+                `😂 **Weather Joke:**\n\nKeralathile Sooryan Mazhayodu paranjhu:\n*"Nee kurachu divasam kooduthal peythal, aalkkar enneyum thedi varum... Pakshe njan thirichu vannaal ellarum AC room-il olichekkollum!"* ☀️🌧️`,
+                `😂 **Weather Joke:**\n\nQ: Mazha peyyumbol aalkkar enthukondaanu umbrella pidikkunnathu?\nAns: Karanam umbrella-kku thaniye nadakkan ariyilla! 🌂🤣`,
+                `😂 **Weather Joke:**\n\nFriend: *"Aliya, innu nalla veyil aanallo, Biryani undakkan pattiya choodu!"*\nMe: *"Choodu koodi ippo njan thanne fry aayi maran chance undu!"* 🍳🔥`
+            ];
+            const jokesEn = [
+                `😂 **Weather Pun:**\n\nWhy does Snoop Dogg always carry an umbrella?\n**FO' DRIZZLE!** 🌧️🤣`,
+                `😂 **Weather Pun:**\n\nWhat did the cloud wear under its raincoat?\n**Thunderwear!** ⚡😂`,
+                `😂 **Weather Pun:**\n\nHow do tornadoes celebrate birthdays?\n**They have a twist-party!** 🌪️🎂`
+            ];
+            const jokeList = isManglish ? jokesMl : jokesEn;
+            const chosenJoke = jokeList[Math.floor(Math.random() * jokeList.length)];
+            this.addAssistantMessage(chosenJoke, [], isManglish);
+            return;
+        }
+
         // 1. CLIMATE SCIENCE INQUIRY
         if (intent.type === 'climate') {
             const info = CLIMATE_KNOWLEDGE[intent.topic];
@@ -1450,7 +1660,8 @@ class ChatManager {
         }
 
         state.activeCity = city;
-        document.getElementById('active-location-name').textContent = `${city.name}, ${city.country || ''}`;
+        const locationDisplay = `${city.name}${city.admin1 && city.admin1 !== city.name ? ', ' + city.admin1 : ''}${city.country ? ', ' + city.country : ''}`;
+        document.getElementById('active-location-name').textContent = locationDisplay;
 
         this.showTyping(`Fetching high-resolution NWP models & air quality for ${city.name}...`);
 
@@ -1462,7 +1673,7 @@ class ChatManager {
         const wmo = getWmoInfo(weatherData.current.weather_code);
         if (atmosphere) atmosphere.setMood(wmo.mood);
 
-        const detectedAlerts = AlertDetector.detect(weatherData, aqiData, state.units);
+        const detectedAlerts = AlertDetector.detect(weatherData, aqiData, state.units, isManglish);
         const tempUnit = state.units === 'imperial' ? '°F' : '°C';
         const windUnit = state.units === 'imperial' ? 'mph' : 'km/h';
         const cur = weatherData.current;
@@ -1485,40 +1696,47 @@ class ChatManager {
             return;
         }
 
-        // Standard English responses
+        // Standard English responses with funny/friendly alert highlights
+        let alertHighlight = "";
+        if (detectedAlerts.length > 0) {
+            alertHighlight = `\n> **${detectedAlerts[0].badge}**: ${detectedAlerts[0].desc}\n`;
+        }
+
         if (intent.type === 'aqi') {
             const usAqi = aqiData && aqiData.current ? aqiData.current.us_aqi : 'N/A';
-            narrative = `### Air Quality & Environmental Health Diagnostic: **${city.name}**\nCurrent **US AQI index** is measured at **${usAqi}**.\n* Dominant particulates include PM2.5 and PM10 measured by the European Copernicus Atmospheric Monitoring Service (CAMS).\n* Review the full pollutant breakdown below:`;
+            narrative = `### Air Quality & Environmental Health Diagnostic: **${locationDisplay}**\nCurrent **US AQI index** is measured at **${usAqi}**.\n* Dominant particulates include PM2.5 and PM10 measured by the European Copernicus Atmospheric Monitoring Service (CAMS).\n* Review the full pollutant breakdown below:`;
             widgets.push(UIRenderer.createAqiCard(aqiData));
             widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
         } else if (intent.type === 'alert') {
             if (detectedAlerts.length > 0) {
-                narrative = `⚠️ **Active Meteorological Alerts Detected for ${city.name}:**\nI have analyzed real-time atmospheric telemetry and flagged **${detectedAlerts.length} critical advisory tier(s)**. Review the emergency guidance below:`;
+                narrative = `### ⚠️ Meteorological Alerts for **${locationDisplay}**\n${alertHighlight}Review the actionable safety tips and advisory below:`;
                 widgets.push(UIRenderer.createAlertCards(detectedAlerts));
                 widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
             } else {
-                narrative = `✅ **No Severe Storm Warnings or Critical Watches Active for ${city.name}**\nAtmospheric pressure is steady at **${Math.round(cur.pressure_msl || cur.surface_pressure || 1013)} hPa**, surface winds are calm to moderate at **${Math.round(cur.wind_speed_10m)} ${windUnit}**, and no immediate thermal or convective hazard thresholds are breached.`;
+                narrative = `✅ **Calm Weather for ${locationDisplay}**\nAtmospheric pressure is steady at **${Math.round(cur.pressure_msl || cur.surface_pressure || 1013)} hPa**, surface winds are calm to moderate at **${Math.round(cur.wind_speed_10m)} ${windUnit}**, and no severe weather hazards are active.`;
                 widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
                 widgets.push(UIRenderer.createHourlyCard(weatherData, state.units));
             }
         } else if (intent.type === 'lifestyle') {
             const advice = WeatherGPTEngine.generateLifestyleAdvice(cur, daily, state.units);
-            narrative = `### Meteorological Lifestyle & Clothing Advisory for **${city.name}**\nCurrently **${Math.round(cur.temperature_2m)}${tempUnit}** (feels like **${Math.round(cur.apparent_temperature)}${tempUnit}**) with *${wmo.desc}*.\n\n🧥 **What To Wear**:\n${advice.clothing.map(c => `* ${c}`).join('\n')}\n\n🎒 **Gear & Essentials**:\n${advice.gear.length > 0 ? advice.gear.map(g => `* ${g}`).join('\n') : '* Standard day-wear is sufficient; no specialized wet-weather gear required.'}\n\n🏃 **Outdoor Activity Suitability**:\n* ${advice.outdoorAdvice}`;
+            narrative = `### Meteorological Lifestyle & Clothing Advisory for **${locationDisplay}**\n${alertHighlight}Currently **${Math.round(cur.temperature_2m)}${tempUnit}** (feels like **${Math.round(cur.apparent_temperature)}${tempUnit}**) with *${wmo.desc}*.\n\n🧥 **What To Wear**:\n${advice.clothing.map(c => `* ${c}`).join('\n')}\n\n🎒 **Gear & Essentials**:\n${advice.gear.length > 0 ? advice.gear.map(g => `* ${g}`).join('\n') : '* Standard day-wear is sufficient; no specialized wet-weather gear required.'}\n\n🏃 **Outdoor Activity Suitability**:\n* ${advice.outdoorAdvice}`;
+            if (detectedAlerts.length > 0) widgets.push(UIRenderer.createAlertCards(detectedAlerts));
             widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
             widgets.push(UIRenderer.createHourlyCard(weatherData, state.units));
         } else if (intent.type === 'forecast') {
-            narrative = `### 7-Day Atmospheric Outlook for **${city.name}, ${city.country || ''}**\nThe upcoming synoptic pattern shows a diurnal high of **${Math.round(daily.temperature_2m_max[0])}${tempUnit}** and overnight low of **${Math.round(daily.temperature_2m_min[0])}${tempUnit}**.\n${detectedAlerts.length > 0 ? `> ⚠️ **Notice:** Extreme weather thresholds detected. See alert card below.\n` : ''}`;
+            narrative = `### 7-Day Atmospheric Outlook for **${locationDisplay}**\n${alertHighlight}The upcoming synoptic pattern shows a diurnal high of **${Math.round(daily.temperature_2m_max[0])}${tempUnit}** and overnight low of **${Math.round(daily.temperature_2m_min[0])}${tempUnit}**.`;
             if (detectedAlerts.length > 0) widgets.push(UIRenderer.createAlertCards(detectedAlerts));
             widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
             widgets.push(UIRenderer.createDailyCard(weatherData, state.units));
             widgets.push(UIRenderer.createHourlyCard(weatherData, state.units));
         } else if (intent.type === 'hourly') {
-            narrative = `### 24-Hour Diurnal Progression for **${city.name}**\nReview the interactive temperature curve and precipitation probability below. Peak temperature will reach **${Math.round(daily.temperature_2m_max[0])}${tempUnit}**.`;
+            narrative = `### 24-Hour Diurnal Progression for **${locationDisplay}**\n${alertHighlight}Review the interactive temperature curve and precipitation probability below. Peak temperature will reach **${Math.round(daily.temperature_2m_max[0])}${tempUnit}**.`;
+            if (detectedAlerts.length > 0) widgets.push(UIRenderer.createAlertCards(detectedAlerts));
             widgets.push(UIRenderer.createHourlyCard(weatherData, state.units));
             widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
         } else {
             const rainMax = daily.precipitation_probability_max ? daily.precipitation_probability_max[0] : 0;
-            narrative = `### Meteorological Briefing: **${city.name}, ${city.country || ''}**\n* **Current Conditions**: **${Math.round(cur.temperature_2m)}${tempUnit}** • *${wmo.desc}* (Feels like **${Math.round(cur.apparent_temperature)}${tempUnit}**)\n* **Diurnal Range**: Expected high of **${Math.round(daily.temperature_2m_max[0])}${tempUnit}** and overnight low of **${Math.round(daily.temperature_2m_min[0])}${tempUnit}**.\n* **Precipitation Risk**: Maximum rain chance today is **${rainMax}%** with humidity at **${cur.relative_humidity_2m}%**.\n* **Wind**: Surface winds blowing at **${Math.round(cur.wind_speed_10m)} ${windUnit}** from the **${UIRenderer.getWindDirection(cur.wind_direction_10m)}**.`;
+            narrative = `### Meteorological Briefing: **${locationDisplay}**\n${alertHighlight}* **Current Conditions**: **${Math.round(cur.temperature_2m)}${tempUnit}** • *${wmo.desc}* (Feels like **${Math.round(cur.apparent_temperature)}${tempUnit}**)\n* **Diurnal Range**: Expected high of **${Math.round(daily.temperature_2m_max[0])}${tempUnit}** and overnight low of **${Math.round(daily.temperature_2m_min[0])}${tempUnit}**.\n* **Precipitation Risk**: Maximum rain chance today is **${rainMax}%** with humidity at **${cur.relative_humidity_2m}%**.\n* **Wind**: Surface winds blowing at **${Math.round(cur.wind_speed_10m)} ${windUnit}** from the **${UIRenderer.getWindDirection(cur.wind_direction_10m)}**.`;
             if (detectedAlerts.length > 0) widgets.push(UIRenderer.createAlertCards(detectedAlerts));
             widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
             widgets.push(UIRenderer.createHourlyCard(weatherData, state.units));
@@ -1925,15 +2143,15 @@ function updateApiKeyBadge() {
         }
     } else {
         badge.classList.remove('connected');
-        dot.className = 'status-dot dot-empty';
-        text.textContent = '🔑 Connect Gemini 3.6';
+        dot.className = 'status-dot dot-connected';
+        text.textContent = '⚡ AI Ready (Free)';
     }
 }
 
 function setupApiKeyModal() {
     const modal = document.getElementById('apikey-modal');
     const openBtn = document.getElementById('btn-open-apikey');
-    const welcomeKeyBtn = document.getElementById('btn-welcome-apikey');
+    const welcomeKochiBtn = document.getElementById('btn-welcome-kochi');
     const closeBtn = document.getElementById('btn-close-apikey');
     const testSaveBtn = document.getElementById('btn-test-save-key');
     const removeBtn = document.getElementById('btn-remove-api-key');
@@ -1976,13 +2194,23 @@ function setupApiKeyModal() {
         providerSelect.value = state.llmProvider;
         if (modelSelect) modelSelect.value = state.geminiModel || 'gemini-3.6-flash';
         syncProviderVisibility();
-        feedback.className = 'key-test-feedback hidden';
+        feedback.className = 'key-test-feedback';
         feedback.textContent = '';
         modal.classList.remove('hidden');
+        keyInput.focus();
     };
 
     if (openBtn) openBtn.addEventListener('click', openModal);
-    if (welcomeKeyBtn) welcomeKeyBtn.addEventListener('click', openModal);
+    if (welcomeKochiBtn) {
+        welcomeKochiBtn.addEventListener('click', () => {
+            const input = document.getElementById('user-input');
+            if (input) {
+                input.value = "What is the current weather, rain chance, and alerts in Kochi, Kerala?";
+                const sendBtn = document.getElementById('btn-send');
+                if (sendBtn) sendBtn.click();
+            }
+        });
+    }
     if (closeBtn) closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
 
     // Toggle password visibility
