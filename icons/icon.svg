@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="sunGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="cloudGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <linearGradient id="boltGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#facc15"/>
+      <stop offset="100%" stop-color="#eab308"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#0b0f19"/>
+  <circle cx="256" cy="256" r="210" fill="url(#bgGrad)" stroke="#38bdf8" stroke-width="6" stroke-opacity="0.6"/>
+  <circle cx="330" cy="180" r="75" fill="url(#sunGrad)"/>
+  <circle cx="200" cy="290" r="65" fill="url(#cloudGrad)"/>
+  <circle cx="280" cy="245" r="80" fill="url(#cloudGrad)"/>
+  <circle cx="345" cy="290" r="55" fill="url(#cloudGrad)"/>
+  <rect x="200" y="290" width="145" height="65" rx="30" fill="url(#cloudGrad)"/>
+  <polygon points="275,305 220,385 260,385 230,460 320,365 280,365 305,305" fill="url(#boltGrad)" stroke="#fef08a" stroke-width="3"/>
+</svg>

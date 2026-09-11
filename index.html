@@ -2,85 +2,604 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Quiz Generator | Turn PDFs into MCQs</title>
-    <!-- SEO Best Practices -->
-    <meta name="description" content="AI-powered tool that automatically generates Multiple Choice Questions from your uploaded PDF notes and study materials.">
-    <!-- Font Awesome for quick icons without npm -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WeatherGPT — Conversational AI for Weather Forecasting, Alerts & Climate</title>
+    <meta name="description" content="Intelligent conversational AI meteorologist for real-time weather forecasts, severe weather warnings, air quality diagnostics, deep climate insights, and natural Manglish conversation with Gemini 3.6.">
+    
+    <!-- PWA & Mobile Web App Capabilities -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0b0f19">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="WeatherGPT">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
+
+    <!-- OpenGraph & Social Sharing Meta Tags -->
+    <meta property="og:title" content="WeatherGPT — Conversational AI Meteorologist">
+    <meta property="og:description" content="Conversational AI for real-time weather forecasting, alerts, air quality, and natural Manglish with Gemini 3.6.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="./icons/icon-512.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="WeatherGPT — Conversational AI Meteorologist">
+    <meta name="twitter:description" content="Conversational AI for real-time weather forecasting, alerts, and natural Manglish with Gemini 3.6.">
+    <meta name="twitter:image" content="./icons/icon-512.png">
+
+    <!-- Favicon & Fonts -->
+    <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Icons (FontAwesome 6) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Leaflet CSS for Weather Radar Map -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    
+    <!-- Application Styles -->
     <link rel="stylesheet" href="./styles.css">
 </head>
-<body>
-    <div id="app">
-        <header>
-            <h1>Quizify AI</h1>
-            <p class="subtitle">Transform your study materials into interactive quizzes instantly.</p>
-        </header>
+<body class="theme-dark" data-weather-mood="default">
+    <!-- Dynamic Atmospheric Particle / Atmosphere Canvas -->
+    <canvas id="weather-canvas" aria-hidden="true"></canvas>
+    
+    <!-- Ambient Glow / Backdrop -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
 
-        <!-- UPLOAD SECTION -->
-        <main class="glass-panel" id="upload-view">
-            <div class="upload-area" id="drop-zone" onclick="document.getElementById('file-input').click()">
-                <i class="fa-solid fa-file-pdf upload-icon"></i>
-                <div class="upload-text">Drag & drop your PDF here</div>
-                <div class="upload-hint">or click to browse files</div>
-                <input type="file" id="file-input" accept="application/pdf,.txt" />
-            </div>
-        </main>
-
-        <!-- LOADING SECTION -->
-        <main class="glass-panel" id="loading-view">
-            <div class="spinner-wrapper">
-                <div class="spinner"></div>
-            </div>
-            <div class="pulse-text" id="loading-text">Analyzing document...</div>
-            <p class="upload-hint" style="margin-top: 1rem;">Our AI is extracting text and generating questions.</p>
-        </main>
-
-        <!-- QUIZ SECTION -->
-        <main class="glass-panel" id="quiz-view">
-            <div class="question-header">
-                <div class="question-count">Question <span id="current-q-num">1</span> of <span id="total-q-num">5</span></div>
-                <div class="score-display">Score: <span id="score-val">0</span></div>
-            </div>
-            
-            <div class="question-text" id="question-text">
-                Loading question...
-            </div>
-            
-            <div class="options-grid" id="options-container">
-                <!-- Options will be injected here via JS -->
+    <div id="app-layout">
+        <!-- COLLAPSIBLE SIDEBAR -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-badge">
+                    <div class="brand-icon-pulse">
+                        <i class="fa-solid fa-cloud-bolt"></i>
+                    </div>
+                    <div class="brand-text">
+                        <h2>WeatherGPT</h2>
+                        <span class="badge-tag">AI METEOROLOGIST</span>
+                    </div>
+                </div>
+                <button id="btn-close-sidebar" class="icon-btn mobile-only" title="Close Sidebar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
 
-            <div class="action-bar">
-                <button class="btn-primary" id="next-btn" disabled>Next Question <i class="fa-solid fa-arrow-right" style="margin-left: 8px;"></i></button>
+            <div class="sidebar-actions">
+                <button id="btn-new-chat" class="btn-new-chat">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>New Consultation</span>
+                </button>
+                <button id="btn-sidebar-install" class="sidebar-install-btn hidden" title="Install WeatherGPT App">
+                    <i class="fa-solid fa-mobile-screen-button text-cyan"></i>
+                    <span>Install App</span>
+                </button>
             </div>
-        </main>
 
-        <!-- RESULTS SECTION -->
-        <main class="glass-panel hidden" id="results-view" style="text-align: center;">
-            <i class="fa-solid fa-trophy" style="font-size: 4rem; color: #fbbf24; margin-bottom: 1rem;"></i>
-            <h2 style="font-size: 2rem; margin-bottom: 1rem;">Quiz Completed!</h2>
-            <p style="font-size: 1.2rem; margin-bottom: 2rem;">You scored <strong id="final-score">0</strong> out of <strong id="final-total">0</strong>.</p>
-            <button class="btn-primary" onclick="location.reload()">Create Another Quiz</button>
-        </main>
+            <div class="sidebar-scrollable">
+                <!-- SAVED / FAVORITE CITIES -->
+                <div class="sidebar-section">
+                    <div class="section-title">
+                        <span><i class="fa-solid fa-star text-gold"></i> Saved Locations</span>
+                        <span id="saved-cities-count" class="count-pill">0</span>
+                    </div>
+                    <div id="saved-cities-list" class="saved-cities-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
 
-        <div class="watermark">
-            by aswin 
-            <a href="https://www.instagram.com/axwinn.n/" target="_blank" title="Instagram Profile">
-                <i class="fa-brands fa-instagram"></i>
-            </a>
+                <!-- MANGLISH & KERALA WEATHER SECTION -->
+                <div class="sidebar-section">
+                    <div class="section-title">
+                        <span><i class="fa-solid fa-leaf text-emerald"></i> Manglish (മലയാളം)</span>
+                    </div>
+                    <div class="topic-chips">
+                        <button class="topic-chip" data-prompt="Kochi-yil nale mazha peyyumo? Kuda edukkano?">
+                            <i class="fa-solid fa-cloud-rain text-cyan"></i> Kochi Mazha & Kuda 🌧️
+                        </button>
+                        <button class="topic-chip" data-prompt="Trivandrum weather engane undu innu? Nalla choodano?">
+                            <i class="fa-solid fa-sun text-gold"></i> Trivandrum Choodu ☀️
+                        </button>
+                        <button class="topic-chip" data-prompt="Kozhikode-il innu idi-minnal alerts undo? Safe aano?">
+                            <i class="fa-solid fa-bolt text-amber"></i> Kozhikode Alerts ⚡
+                        </button>
+                        <button class="topic-chip" data-prompt="Wayanad climate ippo enganeya? Yathrakku nallathano?">
+                            <i class="fa-solid fa-mountain-sun text-emerald"></i> Wayanad Climate 🌿
+                        </button>
+                        <button class="topic-chip" data-prompt="Munnar temperature ippo ethraya? Thanuppundo?">
+                            <i class="fa-solid fa-temperature-low text-ice"></i> Munnar Thanuppu ❄️
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TOPIC EXPLORER / CAPABILITIES -->
+                <div class="sidebar-section">
+                    <div class="section-title">
+                        <span><i class="fa-solid fa-compass"></i> Atmospheric Topics</span>
+                    </div>
+                    <div class="topic-chips">
+                        <button class="topic-chip" data-prompt="Show 7-day weather forecast with rain probability for Tokyo">
+                            <i class="fa-solid fa-calendar-week"></i> 7-Day Forecast
+                        </button>
+                        <button class="topic-chip" data-prompt="Are there any severe weather alerts or storm warnings near Florida right now?">
+                            <i class="fa-solid fa-triangle-exclamation text-amber"></i> Severe Alerts
+                        </button>
+                        <button class="topic-chip" data-prompt="What is the current Air Quality Index (AQI), PM2.5, and health advisory in New Delhi?">
+                            <i class="fa-solid fa-mask-ventilator text-cyan"></i> Air Quality (AQI)
+                        </button>
+                        <button class="topic-chip" data-prompt="What should I wear today in London? Give me clothing and outdoor activity advice.">
+                            <i class="fa-solid fa-vest text-emerald"></i> What To Wear
+                        </button>
+                        <button class="topic-chip" data-prompt="Explain the El Niño and La Niña (ENSO) cycle and how it affects global precipitation and climate change.">
+                            <i class="fa-solid fa-earth-americas text-blue"></i> El Niño Climate
+                        </button>
+                        <button class="topic-chip" data-prompt="Compare the climate and annual rainfall patterns between San Francisco and Seattle.">
+                            <i class="fa-solid fa-code-compare text-purple"></i> Compare Climates
+                        </button>
+                        <button class="topic-chip" data-prompt="What is the Polar Vortex and how does it cause sudden extreme winter cold snaps?">
+                            <i class="fa-solid fa-snowflake text-ice"></i> Polar Vortex Science
+                        </button>
+                    </div>
+                </div>
+
+                <!-- RECENT QUERIES -->
+                <div class="sidebar-section">
+                    <div class="section-title">
+                        <span><i class="fa-solid fa-clock-rotate-left"></i> Recent Queries</span>
+                        <button id="btn-clear-history" class="text-btn" title="Clear History">Clear</button>
+                    </div>
+                    <div id="recent-queries-list" class="recent-queries-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- SIDEBAR FOOTER -->
+            <div class="sidebar-footer">
+                <div class="telemetry-box">
+                    <div class="telemetry-status">
+                        <span class="pulse-dot"></span>
+                        <span class="telemetry-label">Open-Meteo High-Res Active</span>
+                    </div>
+                    <div class="telemetry-desc">Zero-API-key global NWP models</div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN VIEWPORT -->
+        <div id="main-content" class="main-content">
+            <!-- TOP NAVBAR -->
+            <header class="top-navbar">
+                <div class="nav-left">
+                    <button id="btn-toggle-sidebar" class="icon-btn" title="Toggle Sidebar" aria-label="Toggle Sidebar">
+                        <i class="fa-solid fa-bars-staggered"></i>
+                    </button>
+                    <div class="current-location-chip" id="current-location-display" title="Active Focus City">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span id="active-location-name">Global Meteorological AI</span>
+                    </div>
+                </div>
+
+                <div class="nav-right">
+                    <!-- LANGUAGE SELECTOR -->
+                    <div class="lang-selector-wrapper" title="Change Language / Manglish">
+                        <select id="select-language" class="lang-selector-nav">
+                            <option value="auto">🌐 Auto-Detect</option>
+                            <option value="manglish">🌴 Manglish (മലയാളം)</option>
+                            <option value="english">🇬🇧 English</option>
+                        </select>
+                    </div>
+
+                    <!-- API KEY QUICK STATUS / SETUP BUTTON -->
+                    <button id="btn-open-apikey" class="api-key-status-badge" title="Connect Google Gemini 3.6 or OpenAI API Key">
+                        <span class="status-dot dot-empty" id="apikey-status-dot"></span>
+                        <span id="apikey-badge-text">🔑 Connect Gemini 3.6</span>
+                    </button>
+
+                    <!-- UNIT TOGGLE -->
+                    <div class="unit-selector" title="Switch Temperature Units">
+                        <button class="unit-btn active" id="unit-c">°C</button>
+                        <button class="unit-btn" id="unit-f">°F</button>
+                    </div>
+
+                    <!-- INSTALL APP BUTTON (PWA) -->
+                    <button id="btn-install-app" class="nav-action-btn install-pulse hidden" title="Install WeatherGPT App">
+                        <i class="fa-solid fa-download text-cyan"></i>
+                        <span class="btn-text-desktop">Install App</span>
+                    </button>
+
+                    <!-- RADAR MAP BUTTON -->
+                    <button id="btn-open-map" class="nav-action-btn" title="Open Weather Radar & Live Map">
+                        <i class="fa-solid fa-map-location-dot"></i>
+                        <span class="btn-text-desktop">Radar</span>
+                    </button>
+
+                    <!-- VOICE READOUT TOGGLE -->
+                    <button id="btn-toggle-tts" class="icon-btn" title="Toggle Voice Responses" aria-pressed="false">
+                        <i class="fa-solid fa-volume-xmark" id="tts-icon"></i>
+                    </button>
+
+                    <!-- SETTINGS BUTTON -->
+                    <button id="btn-open-settings" class="icon-btn" title="Settings">
+                        <i class="fa-solid fa-gear"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- CHAT AREA -->
+            <main class="chat-viewport">
+                <div id="chat-messages" class="chat-messages">
+                    <!-- WELCOME ONBOARDING STATE -->
+                    <div id="welcome-card" class="welcome-card">
+                        <div class="welcome-badge">
+                            <i class="fa-solid fa-meteor"></i>
+                            <span>ATMOSPHERIC INTELLIGENCE ENGINE</span>
+                        </div>
+                        <h1 class="welcome-title">WeatherGPT</h1>
+                        <p class="welcome-subtitle">
+                            Conversational AI for Real-Time Weather Forecasting, Severe Storm Alerts, Air Quality, Climate Science, and natural <strong>Manglish</strong> dialogue with <strong>Gemini 3.6</strong>.
+                        </p>
+
+                        <div class="welcome-quick-actions">
+                            <button class="btn-locate-me" id="btn-welcome-locate">
+                                <i class="fa-solid fa-crosshairs"></i>
+                                <span>Brief My Current Location</span>
+                            </button>
+                            <button class="btn-key-setup" id="btn-welcome-apikey">
+                                <i class="fa-solid fa-key text-gold"></i>
+                                <span>Connect Gemini 3.6 API Key</span>
+                            </button>
+                        </div>
+
+                        <div class="welcome-cards-grid">
+                            <div class="feature-card" data-prompt="What's the weather in Tokyo right now? Include hourly forecast and feels like.">
+                                <div class="card-icon"><i class="fa-solid fa-cloud-sun"></i></div>
+                                <h4>Instant Global Forecasts</h4>
+                                <p>Real-time telemetry, 24h interactive curves & 7-day outlooks.</p>
+                            </div>
+
+                            <div class="feature-card" data-prompt="Kochi-yil nale mazha peyyan chance undo? Kuda edukkano?">
+                                <div class="card-icon text-emerald"><i class="fa-solid fa-leaf"></i></div>
+                                <h4>Manglish Natural AI</h4>
+                                <p>Talk naturally in Manglish (Malayalam + English) about local Kerala weather.</p>
+                            </div>
+
+                            <div class="feature-card" data-prompt="Are there any severe weather alerts or gale wind warnings in Florida?">
+                                <div class="card-icon text-amber"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                <h4>Severe Alerts & Safety</h4>
+                                <p>Detection of heatwaves, storms, gales, frost & safety advisories.</p>
+                            </div>
+
+                            <div class="feature-card" data-prompt="Give me the Air Quality Index (AQI) report and pollutant levels for New Delhi today.">
+                                <div class="card-icon text-cyan"><i class="fa-solid fa-wind"></i></div>
+                                <h4>Air Quality & AQI</h4>
+                                <p>PM2.5, PM10, ozone, smog levels & actionable health guidance.</p>
+                            </div>
+                        </div>
+
+                        <div class="quick-pills-row">
+                            <span class="pills-label">Suggested English:</span>
+                            <button class="quick-pill" data-prompt="Will it rain in London this weekend?">London weekend rain 🌧️</button>
+                            <button class="quick-pill" data-prompt="Weather in Paris today and what should I wear?">Paris clothing advice 🧥</button>
+                            <button class="quick-pill" data-prompt="Compare the climate of San Francisco vs Seattle">Compare SF vs Seattle 🏙️</button>
+                            <button class="quick-pill" data-prompt="UV index and sun safety advisory for Sydney">Sydney UV index ☀️</button>
+                        </div>
+
+                        <div class="quick-pills-row mt-2">
+                            <span class="pills-label text-emerald">Manglish (മലയാളം):</span>
+                            <button class="quick-pill pill-manglish" data-prompt="Kochi-yil nale mazha peyyumo? Kuda edukkano?">Kochi mazha & kuda 🌧️</button>
+                            <button class="quick-pill pill-manglish" data-prompt="Trivandrum weather engane undu innu? Nalla choodano?">Trivandrum choodu ☀️</button>
+                            <button class="quick-pill pill-manglish" data-prompt="Kozhikode-il innu idi-minnal alerts undo?">Kozhikode alerts ⚡</button>
+                            <button class="quick-pill pill-manglish" data-prompt="Wayanad climate ippo enganeya? Yathrakku nallathano?">Wayanad climate 🌿</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TYPING / PROCESSING INDICATOR -->
+                <div id="typing-indicator" class="typing-indicator hidden">
+                    <div class="ai-avatar-sm">
+                        <i class="fa-solid fa-cloud-bolt"></i>
+                    </div>
+                    <div class="typing-bubble">
+                        <div class="typing-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <span id="typing-status-text" class="typing-status-text">WeatherGPT is analyzing meteorological models...</span>
+                    </div>
+                </div>
+            </main>
+
+            <!-- CHAT INPUT CONTAINER -->
+            <footer class="chat-input-wrapper">
+                <div class="input-container glass-card">
+                    <!-- DETECT LOCATION BUTTON -->
+                    <button id="btn-input-locate" class="input-tool-btn" title="Use My Current Location">
+                        <i class="fa-solid fa-location-crosshairs"></i>
+                    </button>
+
+                    <!-- VOICE INPUT BUTTON -->
+                    <button id="btn-input-voice" class="input-tool-btn voice-btn" title="Voice Input (Speak to WeatherGPT)">
+                        <i class="fa-solid fa-microphone" id="mic-icon"></i>
+                        <span class="voice-pulse-ring"></span>
+                    </button>
+
+                    <!-- TEXTAREA -->
+                    <textarea 
+                        id="user-input" 
+                        rows="1" 
+                        placeholder="Ask about weather, mazha, choodu, AQI in English or Manglish..."
+                        autocomplete="off"
+                        autocorrect="off"
+                        spellcheck="false"
+                    ></textarea>
+
+                    <!-- SEND BUTTON -->
+                    <button id="btn-send" class="btn-send" title="Send query" disabled>
+                        <i class="fa-solid fa-arrow-up"></i>
+                    </button>
+                </div>
+                <div class="input-footer-hint">
+                    <span>WeatherGPT speaks natural English & Manglish. Free NWP models + optional Google Gemini API.</span>
+                </div>
+            </footer>
         </div>
-
     </div>
 
-    <!-- PDF.js library for client-side parsing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script>
-        // Set the worker path for PDF.js
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    </script>
+    <!-- DEDICATED API KEY & MANGLISH AI SETUP MODAL -->
+    <div id="apikey-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <i class="fa-solid fa-key text-gold"></i>
+                    <h3>Connect AI API Key (Gemini 3.6 / OpenAI)</h3>
+                </div>
+                <button id="btn-close-apikey" class="modal-close-btn" title="Close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="modal-body">
+                <p style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 1rem;">
+                    Connecting your <strong>Google Gemini 3.6 API Key</strong> enables human-like, fluent <strong>Manglish</strong> and English conversation with live meteorological tool calling.
+                </p>
+
+                <div class="api-instructions-card">
+                    <div class="instruction-step">
+                        <span class="step-num">1</span>
+                        <div>Get a free API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="text-blue font-bold">Google AI Studio <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.75rem;"></i></a> (100% Free, takes 10 seconds).</div>
+                    </div>
+                    <div class="instruction-step">
+                        <span class="step-num">2</span>
+                        <div>Paste the key below and click <strong>Test & Save Key</strong>. It is stored safely in your browser.</div>
+                    </div>
+                </div>
+
+                <div class="setting-group mt-3">
+                    <label class="setting-label" for="quick-provider-select">Provider</label>
+                    <select id="quick-provider-select" class="settings-select">
+                        <option value="gemini" selected>Google Gemini 3.6 (Gemini 3.6 Flash / Pro — Best for Manglish)</option>
+                        <option value="openai">OpenAI (GPT-4o / GPT-4o-mini)</option>
+                    </select>
+                </div>
+
+                <div class="setting-group mt-3" id="quick-gemini-model-group">
+                    <label class="setting-label" for="quick-gemini-model-select">Gemini Model Version</label>
+                    <select id="quick-gemini-model-select" class="settings-select">
+                        <option value="gemini-3.6-flash" selected>Gemini 3.6 Flash (Recommended — Ultra-Fast Manglish)</option>
+                        <option value="gemini-3.6">Gemini 3.6 (Standard)</option>
+                        <option value="gemini-3.6-pro">Gemini 3.6 Pro (Deep Meteorological Reasoning)</option>
+                        <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                        <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                    </select>
+                </div>
+
+                <div class="setting-group mt-3">
+                    <label class="setting-label" for="quick-api-key-input">API Key</label>
+                    <div class="key-input-wrapper">
+                        <input type="password" id="quick-api-key-input" class="settings-input" placeholder="Paste your API key here (e.g. AIzaSy...)" autocomplete="off" />
+                        <button type="button" id="btn-toggle-key-visibility" class="icon-btn-sm" title="Show/Hide Key">
+                            <i class="fa-regular fa-eye" id="eye-icon"></i>
+                        </button>
+                    </div>
+                    <div id="key-test-feedback" class="key-test-feedback hidden"></div>
+                </div>
+            </div>
+
+            <div class="modal-footer modal-footer-split">
+                <button id="btn-remove-api-key" class="text-btn text-rose" title="Remove custom API key">Remove Key (Use Free Built-in)</button>
+                <button id="btn-test-save-key" class="btn-primary-sm">
+                    <span id="btn-test-save-text">Test & Save Key</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RADAR & SATELLITE WEATHER MAP MODAL -->
+    <div id="radar-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="modal-card modal-large">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <i class="fa-solid fa-satellite-dish text-blue"></i>
+                    <h3>Interactive Weather Radar & Precipitation</h3>
+                </div>
+                <div class="radar-modal-actions">
+                    <div class="map-search-wrapper">
+                        <input type="text" id="map-search-input" placeholder="Jump to city..." />
+                        <button id="btn-map-search" class="icon-btn-sm"><i class="fa-solid fa-magnifying-glass"></i></button>
+                    </div>
+                    <button id="btn-close-map" class="modal-close-btn" title="Close Map"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            
+            <div class="modal-body map-modal-body">
+                <div id="leaflet-map" class="leaflet-map-container"></div>
+                <div class="radar-controls-overlay">
+                    <div class="radar-playback">
+                        <button id="btn-radar-play" class="btn-radar-play" title="Play/Pause Radar Animation">
+                            <i class="fa-solid fa-play" id="radar-play-icon"></i>
+                        </button>
+                        <div class="radar-time-info">
+                            <span class="radar-type-label">Precipitation Radar</span>
+                            <span id="radar-timestamp" class="radar-timestamp">Live</span>
+                        </div>
+                    </div>
+                    <div class="radar-layer-toggles">
+                        <button class="layer-pill active" data-layer="radar">Precipitation</button>
+                        <button class="layer-pill" data-layer="satellite">Infrared Cloud</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <i class="fa-solid fa-sliders text-cyan"></i>
+                    <h3>WeatherGPT Settings</h3>
+                </div>
+                <button id="btn-close-settings" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="modal-body settings-body">
+                <!-- LANGUAGE PREFERENCE -->
+                <div class="setting-group">
+                    <label class="setting-label">Language / Dialect</label>
+                    <div class="segmented-control">
+                        <button class="seg-btn active" id="lang-btn-auto">Auto-Detect</button>
+                        <button class="seg-btn" id="lang-btn-manglish">Manglish (മലയാളം)</button>
+                        <button class="seg-btn" id="lang-btn-english">English</button>
+                    </div>
+                </div>
+
+                <!-- MEASUREMENT UNITS -->
+                <div class="setting-group">
+                    <label class="setting-label">Measurement Units</label>
+                    <div class="segmented-control">
+                        <button class="seg-btn active" id="setting-unit-metric">Metric (°C, km/h, mm)</button>
+                        <button class="seg-btn" id="setting-unit-imperial">Imperial (°F, mph, in)</button>
+                    </div>
+                </div>
+
+                <!-- AI INTELLIGENCE ENGINE -->
+                <div class="setting-group">
+                    <label class="setting-label">AI Engine Mode</label>
+                    <p class="setting-hint">Choose between built-in instant atmospheric NLP or connect your own LLM API key.</p>
+                    <div class="segmented-control vertical">
+                        <button class="seg-btn active" id="mode-builtin">
+                            <div class="seg-label-box">
+                                <strong>Built-in Atmospheric Intelligence (Default)</strong>
+                                <span>Zero keys required • Instant responses • Offline templates</span>
+                            </div>
+                        </button>
+                        <button class="seg-btn" id="mode-external">
+                            <div class="seg-label-box">
+                                <strong>External LLM (Gemini / OpenAI API)</strong>
+                                <span>Uses your personal API key with live meteorological tools</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- EXTERNAL API KEY CONFIG (CONDITIONAL) -->
+                <div id="external-api-section" class="setting-group hidden">
+                    <label class="setting-label" for="select-llm-provider">LLM Provider</label>
+                    <select id="select-llm-provider" class="settings-select">
+                        <option value="gemini" selected>Google Gemini 3.6 (Gemini 3.6 Flash / Pro)</option>
+                        <option value="openai">OpenAI (GPT-4o / GPT-4o-mini)</option>
+                    </select>
+
+                    <label class="setting-label mt-3" for="select-settings-gemini-model">Gemini Model Version</label>
+                    <select id="select-settings-gemini-model" class="settings-select">
+                        <option value="gemini-3.6-flash" selected>Gemini 3.6 Flash (Recommended)</option>
+                        <option value="gemini-3.6">Gemini 3.6 (Standard)</option>
+                        <option value="gemini-3.6-pro">Gemini 3.6 Pro</option>
+                        <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                        <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+                    </select>
+
+                    <label class="setting-label mt-3" for="input-api-key">API Key</label>
+                    <input type="password" id="input-api-key" class="settings-input" placeholder="Paste your API key here..." autocomplete="off">
+                    <p class="setting-hint">Stored safely in your browser LocalStorage only.</p>
+                </div>
+
+                <!-- TEXT TO SPEECH -->
+                <div class="setting-group">
+                    <div class="toggle-row">
+                        <div>
+                            <label class="setting-label">Auto Voice Readout</label>
+                            <p class="setting-hint">Automatically speak out forecasts and severe weather warnings</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-auto-voice">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- DATA SOURCES INFO -->
+                <div class="setting-group-info">
+                    <h4>Meteorological Telemetry Sources</h4>
+                    <p>Weather data provided by <strong>Open-Meteo</strong> & Copernicus ECMWF, GFS, DWD ICON global models. Radar tiles provided by RainViewer. Air Quality provided by CAMS & Open-Meteo Air Quality.</p>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="btn-save-settings" class="btn-primary-sm">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- IOS PWA INSTALL INSTRUCTIONS MODAL -->
+    <div id="ios-install-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="modal-card modal-sm">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <i class="fa-brands fa-apple text-ice"></i>
+                    <h3>Install on iPhone / iPad</h3>
+                </div>
+                <button id="btn-close-ios-install" class="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 1rem; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5;">
+                    Install WeatherGPT to your home screen for a full-screen standalone app experience:
+                </p>
+                <div class="ios-install-steps">
+                    <div class="instruction-step">
+                        <span class="step-num">1</span>
+                        <div>Tap the <strong>Share</strong> button <i class="fa-solid fa-arrow-up-from-bracket text-blue"></i> at the bottom of Safari.</div>
+                    </div>
+                    <div class="instruction-step">
+                        <span class="step-num">2</span>
+                        <div>Scroll down and tap <strong>Add to Home Screen</strong> <i class="fa-regular fa-square-plus text-emerald"></i>.</div>
+                    </div>
+                    <div class="instruction-step">
+                        <span class="step-num">3</span>
+                        <div>Tap <strong>Add</strong> in the top-right corner to launch as an app!</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-dismiss-ios-install" class="btn-primary-sm">Got it</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- LIBRARIES -->
+    <!-- Chart.js for 24h & 7-Day Forecast Charts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     
-    <div class="cursor-glow" id="cursor-glow"></div>
+    <!-- Leaflet for Weather Radar Map -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    
+    <!-- Marked for Markdown Parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.0/marked.min.js"></script>
+
+    <!-- WeatherGPT Application Controller -->
     <script src="./app.js"></script>
 </body>
 </html>
