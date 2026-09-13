@@ -119,8 +119,8 @@
                         <span><i class="fa-solid fa-shield-halved text-amber"></i> Disaster Management</span>
                     </div>
                     <div class="topic-chips">
-                        <button class="topic-chip" data-prompt="What are the current Disaster Management alerts, IMD warnings, and flood risk for Kerala?">
-                            <i class="fa-solid fa-triangle-exclamation text-amber"></i> KSDMA & IMD Alerts 🚨
+                        <button class="topic-chip" data-prompt="What are the current KSDMA disaster management alerts, warnings, and flood risk for Kerala?">
+                            <i class="fa-solid fa-triangle-exclamation text-amber"></i> KSDMA Disaster Management Alerts 🚨
                         </button>
                         <button class="topic-chip" data-prompt="What is the flash flood and landslide (urulpottal) risk in Wayanad and Idukki?">
                             <i class="fa-solid fa-house-flood-water text-cyan"></i> Flood & Landslide Risk 🌊
@@ -219,7 +219,7 @@
                     </button>
 
                     <!-- DISASTER MANAGEMENT ALERTS BUTTON -->
-                    <button id="btn-open-disaster" class="nav-action-btn disaster-nav-btn" title="Disaster Management & Emergency Alerts (IMD/KSDMA/USGS)">
+                    <button id="btn-open-disaster" class="nav-action-btn disaster-nav-btn" title="KSDMA Disaster Management & Emergency Alerts (USGS)">
                         <i class="fa-solid fa-triangle-exclamation text-amber"></i>
                         <span class="btn-text-desktop">Disaster Alerts</span>
                     </button>
@@ -712,7 +712,7 @@
                     <!-- HAZARD LEVELS -->
                     <div class="disaster-section-box">
                         <div class="disaster-box-header">
-                            <h4><i class="fa-solid fa-triangle-exclamation text-amber"></i> IMD Disaster Warning Protocol</h4>
+                            <h4><i class="fa-solid fa-triangle-exclamation text-amber"></i> KSDMA Disaster Management Warning Protocol</h4>
                         </div>
                         <div class="disaster-levels-list">
                             <div class="level-row red-level">
@@ -830,7 +830,7 @@
                         <pre><code>// 1. Fetch live weather telemetry for any city or coordinates
 const weather = await window.WeatherGPT.getWeather("Kochi");
 
-// 2. Fetch disaster management risk & IMD/KSDMA alert levels
+// 2. Fetch disaster management risk & KSDMA alert levels
 const disaster = await window.WeatherGPT.getDisasterAlerts("Kochi");
 
 // 3. Fetch reverse-geocoded location details

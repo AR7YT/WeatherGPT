@@ -655,7 +655,7 @@ class DisasterService {
         if (isExtremeRain || isSevereCyclone || isSevereStormHail) {
             alertLevel = 'red';
             alertBadge = isManglish ? '🔴 RED ALERT: അതീവ ജാഗ്രത' : '🔴 RED ALERT: TAKE ACTION';
-            alertTitle = isManglish ? 'KSDMA / IMD Red Alert: അതീവ ഗുരുതരമായ കാലാവസ്ഥ!' : 'IMD Red Alert: Extreme Disaster Warning!';
+            alertTitle = isManglish ? 'KSDMA Disaster Management Red Alert: അതീവ ഗുരുതരമായ കാലാവസ്ഥ!' : 'KSDMA Disaster Management Red Alert: Extreme Warning!';
             actions = isManglish ? [
                 'അത്യാവശ്യ കാര്യങ്ങൾക്കല്ലാതെ യാത്രകൾ പൂർണ്ണമായി ഒഴിവാക്കുക.',
                 'ഉരുൾപൊട്ടൽ / വെള്ളപ്പൊക്ക സാധ്യതാ മേഖലകളിലുള്ളവർ ദുരിതാശ്വാസ ക്യാമ്പുകളിലേക്ക് മാറുക.',
@@ -672,7 +672,7 @@ class DisasterService {
         else if (rainSum >= 115.6 || rainProb >= 80 || wind >= 62 || (feels >= 42 && [0, 1].includes(wmoCode)) || [95, 96].includes(wmoCode)) {
             alertLevel = 'orange';
             alertBadge = isManglish ? '🟠 ORANGE ALERT: ജാഗ്രത പാലിക്കുക' : '🟠 ORANGE ALERT: BE PREPARED';
-            alertTitle = isManglish ? 'KSDMA Orange Alert: ശക്തമായ ജാഗ്രതാ നിർദ്ദേശം!' : 'IMD Orange Alert: Severe Weather Warning';
+            alertTitle = isManglish ? 'KSDMA Disaster Management Orange Alert: ശക്തമായ ജാഗ്രതാ നിർദ്ദേശം!' : 'KSDMA Disaster Management Orange Alert: Severe Warning';
             actions = isManglish ? [
                 'പുഴകളിലും അരുവികളിലും ഇറങ്ങുന്നത് കർശനമായി ഒഴിവാക്കുക.',
                 'രാത്രി സമയങ്ങളിൽ മലയോര മേഖലകളിലൂടെയുള്ള യാത്രകൾ ഒഴിവാക്കുക.',
@@ -689,7 +689,7 @@ class DisasterService {
         else if (rainSum >= 64.5 || rainProb >= 50 || wind >= 45 || feels >= 38 || [55, 63, 65, 81, 82].includes(wmoCode)) {
             alertLevel = 'yellow';
             alertBadge = isManglish ? '🟡 YELLOW ALERT: നിരീക്ഷിക്കുക' : '🟡 YELLOW ALERT: BE UPDATED';
-            alertTitle = isManglish ? 'Yellow Alert: കാലാവസ്ഥാ മാറ്റങ്ങൾ നിരീക്ഷിക്കുക' : 'IMD Yellow Alert: Weather Watch';
+            alertTitle = isManglish ? 'KSDMA Disaster Management Yellow Alert: കാലാവസ്ഥാ മാറ്റങ്ങൾ നിരീക്ഷിക്കുക' : 'KSDMA Disaster Management Yellow Alert: Weather Watch';
             actions = isManglish ? [
                 'കാലാവസ്ഥാ അറിയിപ്പുകൾ റേഡിയോയിലോ ഫോണിലോ ശ്രദ്ധിക്കുക.',
                 'ഇടിമിന്നൽ ഉണ്ടാകുമ്പോൾ തുറസ്സായ സ്ഥലങ്ങളിലും മരങ്ങളുടെ ചുവട്ടിലും നിൽക്കരുത്.',
@@ -914,7 +914,7 @@ class WeatherGPTEngine {
         }
 
         // 3c. Disaster Management & Extreme Hazards
-        if (lower.includes('disaster') || lower.includes('ksdma') || lower.includes('imd alert') || lower.includes('red alert') || lower.includes('orange alert') || lower.includes('yellow alert') || lower.includes('flood') || lower.includes('vellappokkam') || lower.includes('landslide') || lower.includes('urulpottal') || lower.includes('earthquake') || lower.includes('bhoomikulukkom') || lower.includes('tsunami') || lower.includes('dam') || lower.includes('emergency helpline') || lower.includes('sos')) {
+        if (lower.includes('disaster') || lower.includes('ksdma') || lower.includes('idms') || lower.includes('idm') || lower.includes('imd') || lower.includes('red alert') || lower.includes('orange alert') || lower.includes('yellow alert') || lower.includes('flood') || lower.includes('vellappokkam') || lower.includes('landslide') || lower.includes('urulpottal') || lower.includes('earthquake') || lower.includes('bhoomikulukkom') || lower.includes('tsunami') || lower.includes('dam') || lower.includes('emergency helpline') || lower.includes('sos')) {
             return { type: 'disaster', query: prompt };
         }
 
@@ -972,7 +972,8 @@ class WeatherGPTEngine {
             'what', 'wear', 'clothing', 'today', 'tomorrow', 'weekend', 'current',
             'mazha', 'choodu', 'kuda', 'nale', 'innu', 'ippo', 'keralam',
             'disaster', 'disasters', 'management', 'flood', 'landslide', 'earthquake',
-            'helpline', 'emergency', 'location', 'details', 'my location', 'specs', 'status'
+            'helpline', 'emergency', 'location', 'details', 'my location', 'specs', 'status',
+            'idms', 'idm', 'ksdma'
         ]);
 
         const matches = [...prompt.matchAll(/\b(?:in|at|for|near)\s+([A-Za-z\s\.-]+?)(?=(?:\s+(?:today|tomorrow|right now|this weekend|next week|with|and|give|please|innu|nale|ippo)|[?!.,;]|$))/gi)];
@@ -1007,11 +1008,11 @@ class WeatherGPTEngine {
             .replace(/7-?day forecast (for|in)?/gi, '')
             .replace(/hourly (forecast |weather )?(in|for)?/gi, '')
             .replace(/tell me (about )?the weather (in|at)?/gi, '')
-            .replace(/weather|forecast|today|tomorrow|right now|mazha|choodu|engane|undo|peyyumo|nale|innu|disaster|emergency|location|details|helpline|warning|warnings/gi, '')
+            .replace(/weather|forecast|today|tomorrow|right now|mazha|choodu|engane|undo|peyyumo|nale|innu|disaster|emergency|location|details|helpline|warning|warnings|idms|idm|ksdma/gi, '')
             .replace(/[?.,!]/g, '')
             .trim();
 
-        const invalidNames = new Set(['disaster', 'location', 'details', 'my', 'alert', 'alerts', 'emergency', 'ksdma', 'imd', 'usgs', 'specs', 'status']);
+        const invalidNames = new Set(['disaster', 'location', 'details', 'my', 'alert', 'alerts', 'emergency', 'ksdma', 'imd', 'idms', 'idm', 'usgs', 'specs', 'status']);
         if (!clean || invalidNames.has(clean.toLowerCase())) {
             return (state.activeCity && state.activeCity.name) ? state.activeCity.name : 'Kochi';
         }
@@ -1702,7 +1703,7 @@ class UIRenderer {
                     <i class="fa-solid fa-shield-halved" style="font-size: 1.5rem; color: ${alertColor};"></i>
                     <div>
                         <h3>${disaster.title}</h3>
-                        <span style="font-size: 0.78rem; color: var(--text-muted);">Region: <strong>${location.name || 'Current Location'}</strong> (KSDMA / IMD Protocol)</span>
+                        <span style="font-size: 0.78rem; color: var(--text-muted);">Region: <strong>${location.name || 'Current Location'}</strong> (KSDMA Disaster Management Protocol)</span>
                     </div>
                 </div>
                 <span class="disaster-badge badge-${disaster.level}">${disaster.badge}</span>
@@ -2069,9 +2070,9 @@ A world-class conversational AI meteorologist powered by real-time Open-Meteo Eu
 
             if (intent.type === 'disaster') {
                 const hazardDetails = (disasterRisk.hazards || []).map(h => `* **${h.name}**: ${h.value}`).join('\n');
-                narrative = `### 🚨 **KSDMA & IMD Disaster Management Assessment: ${city.name}**\n` +
+                narrative = `### 🚨 **KSDMA Disaster Management Assessment: ${city.name}**\n` +
                     `* ⚠️ **Warning Level**: **${disasterRisk.badge}**\n` +
-                    `* 📋 **Official Protocol**: IMD / KSDMA Color-Coded Severe Weather Framework\n` +
+                    `* 📋 **Official Protocol**: KSDMA Disaster Management Color-Coded Severe Weather Framework\n` +
                     `* ⛰️ **Topography / Elevation**: ${city.elevation !== undefined ? Math.round(city.elevation) + 'm ASL' : 'Lowland / Coastal'}\n\n` +
                     `**Hazard Telemetry Summary**:\n${hazardDetails}\n\n` +
                     `Actionable safety directives, emergency SOS hotlines, and weather curves thazhe kodukkunnu:`;
@@ -2119,9 +2120,9 @@ A world-class conversational AI meteorologist powered by real-time Open-Meteo Eu
             return;
         } else if (intent.type === 'disaster') {
             const hazardDetails = (disasterRisk.hazards || []).map(h => `* **${h.name}**: ${h.value}`).join('\n');
-            narrative = `### 🚨 **Disaster Management & Hazard Assessment: ${locationDisplay}**\n` +
+            narrative = `### 🚨 **KSDMA Disaster Management & Hazard Assessment: ${locationDisplay}**\n` +
                 `* ⚠️ **Early Warning Level**: **${disasterRisk.badge}**\n` +
-                `* 📋 **Warning Protocol**: NDMA / IMD Multi-Hazard Alert Framework\n` +
+                `* 📋 **Warning Protocol**: KSDMA Disaster Management Multi-Hazard Alert Framework\n` +
                 `* ⛰️ **Topography**: ${city.elevation !== undefined ? Math.round(city.elevation) + 'm Elevation' : 'Coastal / Lowland'}\n\n` +
                 `**Hazard Telemetry Breakdown**:\n${hazardDetails}\n\n` +
                 `Actionable civil defense guidelines, 1-tap emergency SOS helplines, and forecast curves are compiled below:`;
@@ -3286,7 +3287,7 @@ function setupApiModal() {
                     alert_level: disasterRisk.level.toUpperCase(),
                     badge: disasterRisk.badge,
                     title: disasterRisk.title,
-                    protocol: "IMD / NDMA / KSDMA Color-Coded Early Warning System",
+                    protocol: "KSDMA Disaster Management Color-Coded Early Warning System",
                     evaluated_hazards: disasterRisk.hazards,
                     safety_directives: disasterRisk.actions,
                     emergency_hotlines_sos: {
