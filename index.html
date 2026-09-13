@@ -113,6 +113,27 @@
                     </div>
                 </div>
 
+                <!-- DISASTER MANAGEMENT & EMERGENCY SECTION -->
+                <div class="sidebar-section">
+                    <div class="section-title">
+                        <span><i class="fa-solid fa-shield-halved text-amber"></i> Disaster Management</span>
+                    </div>
+                    <div class="topic-chips">
+                        <button class="topic-chip" data-prompt="What are the current Disaster Management alerts, IMD warnings, and flood risk for Kerala?">
+                            <i class="fa-solid fa-triangle-exclamation text-amber"></i> KSDMA & IMD Alerts 🚨
+                        </button>
+                        <button class="topic-chip" data-prompt="What is the flash flood and landslide (urulpottal) risk in Wayanad and Idukki?">
+                            <i class="fa-solid fa-house-flood-water text-cyan"></i> Flood & Landslide Risk 🌊
+                        </button>
+                        <button class="topic-chip" data-prompt="Are there any recent earthquakes or seismic activity nearby? Check USGS telemetry.">
+                            <i class="fa-solid fa-earth-americas text-rose"></i> Earthquake Monitor (USGS) 🌍
+                        </button>
+                        <button class="topic-chip" data-prompt="Show emergency disaster helpline numbers and evacuation guidelines for Kerala.">
+                            <i class="fa-solid fa-phone-volume text-emerald"></i> Emergency Helplines 📞
+                        </button>
+                    </div>
+                </div>
+
                 <!-- TOPIC EXPLORER / CAPABILITIES -->
                 <div class="sidebar-section">
                     <div class="section-title">
@@ -197,6 +218,18 @@
                         <span id="apikey-badge-text">⚡ AI Ready (Free)</span>
                     </button>
 
+                    <!-- DISASTER MANAGEMENT ALERTS BUTTON -->
+                    <button id="btn-open-disaster" class="nav-action-btn disaster-nav-btn" title="Disaster Management & Emergency Alerts (IMD/KSDMA/USGS)">
+                        <i class="fa-solid fa-triangle-exclamation text-amber"></i>
+                        <span class="btn-text-desktop">Disaster Alerts</span>
+                    </button>
+
+                    <!-- WEATHERGPT API / JSON BUTTON -->
+                    <button id="btn-open-api-modal" class="nav-action-btn" title="WeatherGPT Live Data API & Telemetry JSON">
+                        <i class="fa-solid fa-code text-cyan"></i>
+                        <span class="btn-text-desktop">API</span>
+                    </button>
+
                     <!-- UNIT TOGGLE -->
                     <div class="unit-selector" title="Switch Temperature Units">
                         <button class="unit-btn active" id="unit-c">°C</button>
@@ -242,9 +275,9 @@
                         </p>
 
                         <div class="welcome-quick-actions">
-                            <button class="btn-locate-me" id="btn-welcome-locate">
-                                <i class="fa-solid fa-crosshairs"></i>
-                                <span>Brief My Current Location</span>
+                            <button class="btn-locate-me" id="btn-welcome-locate" title="Get detailed breakdown of your location, weather, and disaster alerts">
+                                <i class="fa-solid fa-location-crosshairs"></i>
+                                <span>My Location Details 📍</span>
                             </button>
                             <button class="btn-locate-me btn-kochi-quick" id="btn-welcome-kochi" data-prompt="What is the current weather, rain chance, and alerts in Kochi, Kerala?" title="Check Kochi, Kerala Weather, Rain Chances & Alerts">
                                 <i class="fa-solid fa-umbrella"></i>
@@ -582,6 +615,278 @@
             </div>
             <div class="modal-footer">
                 <button id="btn-dismiss-ios-install" class="btn-primary-sm">Got it</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DISASTER MANAGEMENT & EMERGENCY CENTER MODAL -->
+    <div id="disaster-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="modal-card modal-large">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <i class="fa-solid fa-shield-halved text-amber"></i>
+                    <h3>Disaster Management & Emergency Command Center</h3>
+                </div>
+                <button id="btn-close-disaster" class="modal-close-btn" title="Close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="modal-body disaster-modal-body">
+                <!-- CURRENT LOCATION DISASTER STATUS BANNER -->
+                <div id="disaster-status-banner" class="disaster-banner green-banner">
+                    <div class="disaster-status-icon">
+                        <i class="fa-solid fa-circle-check" id="disaster-banner-icon"></i>
+                    </div>
+                    <div class="disaster-status-content">
+                        <div class="disaster-status-header">
+                            <span class="disaster-badge badge-green" id="disaster-banner-badge">GREEN STATUS: SAFE</span>
+                            <span class="disaster-location-label" id="disaster-banner-location">Active Location: Global Telemetry</span>
+                        </div>
+                        <p id="disaster-banner-desc">No extreme disaster warnings (Red/Orange) currently active for this region. Atmospheric conditions are stable.</p>
+                    </div>
+                    <button id="btn-refresh-disaster" class="btn-refresh-disaster" title="Re-evaluate live telemetry">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>Refresh</span>
+                    </button>
+                </div>
+
+                <!-- EMERGENCY HELPLINES DIRECTORY -->
+                <div class="disaster-section-box">
+                    <div class="disaster-box-header">
+                        <h4><i class="fa-solid fa-phone-volume text-rose"></i> Official Emergency Helplines (1-Tap Call)</h4>
+                        <span class="disaster-hint-tag">NDMA • KSDMA • Unified Emergency</span>
+                    </div>
+                    <div class="emergency-helpline-grid">
+                        <a href="tel:112" class="sos-card sos-primary">
+                            <div class="sos-number">112</div>
+                            <div class="sos-meta">
+                                <strong>National Emergency</strong>
+                                <span>Unified Police, Fire, Ambulance & Disaster</span>
+                            </div>
+                            <i class="fa-solid fa-phone-flip sos-icon"></i>
+                        </a>
+                        <a href="tel:1077" class="sos-card sos-amber">
+                            <div class="sos-number">1077</div>
+                            <div class="sos-meta">
+                                <strong>District Disaster (DDMA)</strong>
+                                <span>24/7 District Emergency Operations</span>
+                            </div>
+                            <i class="fa-solid fa-phone-flip sos-icon"></i>
+                        </a>
+                        <a href="tel:1070" class="sos-card sos-amber">
+                            <div class="sos-number">1070</div>
+                            <div class="sos-meta">
+                                <strong>State Disaster (KSDMA)</strong>
+                                <span>State Emergency Operations Centre</span>
+                            </div>
+                            <i class="fa-solid fa-phone-flip sos-icon"></i>
+                        </a>
+                        <a href="tel:101" class="sos-card sos-red">
+                            <div class="sos-number">101</div>
+                            <div class="sos-meta">
+                                <strong>Fire & Rescue Services</strong>
+                                <span>Water rescue, fallen trees, flooding</span>
+                            </div>
+                            <i class="fa-solid fa-phone-flip sos-icon"></i>
+                        </a>
+                        <a href="tel:108" class="sos-card sos-emerald">
+                            <div class="sos-number">108</div>
+                            <div class="sos-meta">
+                                <strong>Free Ambulance Service</strong>
+                                <span>Medical emergencies & trauma care</span>
+                            </div>
+                            <i class="fa-solid fa-phone-flip sos-icon"></i>
+                        </a>
+                        <a href="tel:1554" class="sos-card sos-blue">
+                            <div class="sos-number">1554</div>
+                            <div class="sos-meta">
+                                <strong>Indian Coast Guard (ICG)</strong>
+                                <span>Fishermen rescue & sea distress</span>
+                            </div>
+                            <i class="fa-solid fa-phone-flip sos-icon"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- DUAL GRID: HAZARD MONITOR & RECENT EARTHQUAKES -->
+                <div class="disaster-columns-grid">
+                    <!-- HAZARD LEVELS -->
+                    <div class="disaster-section-box">
+                        <div class="disaster-box-header">
+                            <h4><i class="fa-solid fa-triangle-exclamation text-amber"></i> IMD Disaster Warning Protocol</h4>
+                        </div>
+                        <div class="disaster-levels-list">
+                            <div class="level-row red-level">
+                                <span class="level-indicator">🔴 RED</span>
+                                <div class="level-desc">
+                                    <strong>Take Action (അതീവ ജാഗ്രത)</strong>
+                                    <span>Rainfall >204.4 mm/24h, flash flood, severe cyclonic storm (>90 km/h)</span>
+                                </div>
+                            </div>
+                            <div class="level-row orange-level">
+                                <span class="level-indicator">🟠 ORANGE</span>
+                                <div class="level-desc">
+                                    <strong>Be Prepared (ജാഗ്രത പാലിക്കുക)</strong>
+                                    <span>Rainfall 115.6 - 204.4 mm/24h, squalls (62-89 km/h), severe heatwave</span>
+                                </div>
+                            </div>
+                            <div class="level-row yellow-level">
+                                <span class="level-indicator">🟡 YELLOW</span>
+                                <div class="level-desc">
+                                    <strong>Be Updated (നിരീക്ഷിക്കുക)</strong>
+                                    <span>Rainfall 64.5 - 115.5 mm/24h, thunderstorms, coastal swells (Kallakkadal)</span>
+                                </div>
+                            </div>
+                            <div class="level-row green-level">
+                                <span class="level-indicator">🟢 GREEN</span>
+                                <div class="level-desc">
+                                    <strong>Normal (സുരക്ഷിതം)</strong>
+                                    <span>No hazardous atmospheric triggers. Safe for outdoor activities</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LIVE USGS SEISMIC & EARTHQUAKE MONITOR -->
+                    <div class="disaster-section-box">
+                        <div class="disaster-box-header">
+                            <h4><i class="fa-solid fa-earth-americas text-cyan"></i> Live Seismic Activity (USGS API)</h4>
+                            <span class="disaster-hint-tag">Recent M2.5+</span>
+                        </div>
+                        <div id="earthquake-list" class="earthquake-list">
+                            <div class="earthquake-loading">
+                                <i class="fa-solid fa-circle-notch fa-spin text-cyan"></i>
+                                <span>Fetching live seismic telemetry from USGS...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EMERGENCY GO-BAG CHECKLIST -->
+                <div class="disaster-section-box">
+                    <div class="disaster-box-header">
+                        <h4><i class="fa-solid fa-kit-medical text-emerald"></i> Disaster Preparedness & Emergency Kit ("Go-Bag")</h4>
+                    </div>
+                    <div class="go-bag-grid">
+                        <div class="go-bag-item"><i class="fa-solid fa-bottle-water text-cyan"></i> <span>Drinking water (minimum 3-day supply)</span></div>
+                        <div class="go-bag-item"><i class="fa-solid fa-flashlight text-gold"></i> <span>Torch with extra alkaline batteries</span></div>
+                        <div class="go-bag-item"><i class="fa-solid fa-battery-full text-emerald"></i> <span>Fully charged power bank & cables</span></div>
+                        <div class="go-bag-item"><i class="fa-solid fa-briefcase-medical text-rose"></i> <span>First aid kit & essential chronic meds</span></div>
+                        <div class="go-bag-item"><i class="fa-solid fa-id-card text-blue"></i> <span>Identity documents in waterproof pouch</span></div>
+                        <div class="go-bag-item"><i class="fa-solid fa-bowl-food text-amber"></i> <span>Non-perishable dry snacks, biscuits, nuts</span></div>
+                        <div class="go-bag-item"><i class="fa-solid fa-radio text-purple"></i> <span>Battery-powered radio for state alerts</span></div>
+                        <div class="go-bag-item"><i class="fa-solid fa-vest text-ice"></i> <span>Light raincoat, whistle & emergency cash</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WEATHERGPT LIVE DATA API & TELEMETRY MODAL -->
+    <div id="api-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+        <div class="modal-card modal-large">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <i class="fa-solid fa-code text-cyan"></i>
+                    <h3>WeatherGPT Live Data API & Telemetry Center</h3>
+                </div>
+                <button id="btn-close-api-modal" class="modal-close-btn" title="Close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="modal-body api-modal-body">
+                <div class="api-overview-banner">
+                    <div class="api-meta">
+                        <h4>Programmatic Meteorological & Disaster Engine</h4>
+                        <p>Access high-resolution European ECMWF & GFS NWP telemetry, real-time disaster alerts, USGS seismic events, and reverse-geocoded location data. 100% Free with zero API keys required.</p>
+                    </div>
+                    <div class="api-quick-actions">
+                        <button id="btn-copy-api-json" class="btn-primary-sm">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>Copy Active JSON</span>
+                        </button>
+                        <button id="btn-download-api-json" class="btn-outline-sm">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Download JSON</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LIVE JSON PREVIEW -->
+                <div class="disaster-section-box">
+                    <div class="disaster-box-header">
+                        <h4><i class="fa-solid fa-brackets-curly text-gold"></i> Live Location Weather & Disaster JSON Payload</h4>
+                        <span class="disaster-hint-tag" id="api-active-location-tag">Active City</span>
+                    </div>
+                    <div class="json-preview-container">
+                        <pre><code id="api-json-display" class="json-code">// Loading live telemetry payload...</code></pre>
+                    </div>
+                </div>
+
+                <!-- CLIENT-SIDE JS API DOCUMENTATION -->
+                <div class="disaster-section-box">
+                    <div class="disaster-box-header">
+                        <h4><i class="fa-brands fa-js text-gold"></i> Browser JavaScript API (`window.WeatherGPT`)</h4>
+                    </div>
+                    <div class="code-snippet-box">
+                        <pre><code>// 1. Fetch live weather telemetry for any city or coordinates
+const weather = await window.WeatherGPT.getWeather("Kochi");
+
+// 2. Fetch disaster management risk & IMD/KSDMA alert levels
+const disaster = await window.WeatherGPT.getDisasterAlerts("Kochi");
+
+// 3. Fetch reverse-geocoded location details
+const location = await window.WeatherGPT.getLocationDetails(9.9399, 76.2602);
+
+// 4. Fetch live USGS earthquakes within 1000km
+const quakes = await window.WeatherGPT.getEarthquakes(9.9399, 76.2602);
+
+console.log(weather, disaster, location, quakes);</code></pre>
+                    </div>
+                </div>
+
+                <!-- DIRECT REST ENDPOINTS -->
+                <div class="disaster-section-box">
+                    <div class="disaster-box-header">
+                        <h4><i class="fa-solid fa-network-wired text-blue"></i> Direct Free REST Endpoints</h4>
+                    </div>
+                    <div class="endpoints-table-wrapper">
+                        <table class="endpoints-table">
+                            <thead>
+                                <tr>
+                                    <th>Service</th>
+                                    <th>Method</th>
+                                    <th>Endpoint URL</th>
+                                    <th>Telemetry Provided</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Open-Meteo NWP</strong></td>
+                                    <td><span class="badge-get">GET</span></td>
+                                    <td><code>https://api.open-meteo.com/v1/forecast</code></td>
+                                    <td>Temperature, Rain, Wind, UV, Hourly & 7-Day</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Disaster Air Quality</strong></td>
+                                    <td><span class="badge-get">GET</span></td>
+                                    <td><code>https://air-quality-api.open-meteo.com/v1/air-quality</code></td>
+                                    <td>US-AQI, PM2.5, PM10, Ozone, Nitrogen Dioxide</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>USGS Seismic Feed</strong></td>
+                                    <td><span class="badge-get">GET</span></td>
+                                    <td><code>https://earthquake.usgs.gov/fdsnws/event/1/query</code></td>
+                                    <td>Live earthquake events, magnitude, depth, location</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Reverse Geocoding</strong></td>
+                                    <td><span class="badge-get">GET</span></td>
+                                    <td><code>https://api.bigdatacloud.net/data/reverse-geocode-client</code></td>
+                                    <td>Locality, City, District, State, Country</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
