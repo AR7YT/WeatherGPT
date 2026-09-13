@@ -140,26 +140,26 @@
                         <span><i class="fa-solid fa-compass"></i> Atmospheric Topics</span>
                     </div>
                     <div class="topic-chips">
-                        <button class="topic-chip" data-prompt="Show 7-day weather forecast with rain probability for Tokyo">
-                            <i class="fa-solid fa-calendar-week"></i> 7-Day Forecast
+                        <button class="topic-chip" data-prompt="Can I spray pesticides in Palakkad today? Check wind speed, rain probability, and spraying feasibility.">
+                            <i class="fa-solid fa-spray-can text-emerald"></i> Spraying Feasibility 🚜
                         </button>
-                        <button class="topic-chip" data-prompt="Are there any severe weather alerts or storm warnings near Florida right now?">
-                            <i class="fa-solid fa-triangle-exclamation text-amber"></i> Severe Alerts
+                        <button class="topic-chip" data-prompt="What is the soil moisture, evapotranspiration, and irrigation recommendation for Wayanad crops?">
+                            <i class="fa-solid fa-droplet text-cyan"></i> Soil Moisture & Irrigation 💧
+                        </button>
+                        <button class="topic-chip" data-prompt="Show 7-day monsoon and rainfall forecast for Palakkad (Kerala Rice Bowl)">
+                            <i class="fa-solid fa-calendar-week text-amber"></i> 7-Day Monsoon Forecast 🌾
+                        </button>
+                        <button class="topic-chip" data-prompt="Are there any thunderstorm, landslide, or flood alerts active in Idukki and Wayanad?">
+                            <i class="fa-solid fa-mountain text-rose"></i> Landslide & Flood Alerts ⚠️
                         </button>
                         <button class="topic-chip" data-prompt="What is the current Air Quality Index (AQI), PM2.5, and health advisory in New Delhi?">
-                            <i class="fa-solid fa-mask-ventilator text-cyan"></i> Air Quality (AQI)
+                            <i class="fa-solid fa-mask-ventilator text-blue"></i> Air Quality (AQI) 💨
                         </button>
-                        <button class="topic-chip" data-prompt="What should I wear today in London? Give me clothing and outdoor activity advice.">
-                            <i class="fa-solid fa-vest text-emerald"></i> What To Wear
+                        <button class="topic-chip" data-prompt="What is the harvesting and drying weather window for paddy in Kuttanad this week?">
+                            <i class="fa-solid fa-wheat-awn text-gold"></i> Paddy Harvesting Window 🌾
                         </button>
-                        <button class="topic-chip" data-prompt="Explain the El Niño and La Niña (ENSO) cycle and how it affects global precipitation and climate change.">
-                            <i class="fa-solid fa-earth-americas text-blue"></i> El Niño Climate
-                        </button>
-                        <button class="topic-chip" data-prompt="Compare the climate and annual rainfall patterns between San Francisco and Seattle.">
-                            <i class="fa-solid fa-code-compare text-purple"></i> Compare Climates
-                        </button>
-                        <button class="topic-chip" data-prompt="What is the Polar Vortex and how does it cause sudden extreme winter cold snaps?">
-                            <i class="fa-solid fa-snowflake text-ice"></i> Polar Vortex Science
+                        <button class="topic-chip" data-prompt="Compare rainfall, humidity, and agricultural climate between Kochi and Palakkad.">
+                            <i class="fa-solid fa-code-compare text-purple"></i> Compare Indian Climates 🇮🇳
                         </button>
                     </div>
                 </div>
@@ -266,12 +266,12 @@
                     <!-- WELCOME ONBOARDING STATE -->
                     <div id="welcome-card" class="welcome-card">
                         <div class="welcome-badge">
-                            <i class="fa-solid fa-meteor"></i>
-                            <span>ATMOSPHERIC INTELLIGENCE ENGINE</span>
+                            <i class="fa-solid fa-seedling text-emerald"></i>
+                            <span>KRISHI & COMMUNITY METEOROLOGICAL ENGINE • INDIA EXCLUSIVE 🇮🇳</span>
                         </div>
-                        <h1 class="welcome-title">WeatherGPT</h1>
+                        <h1 class="welcome-title">WeatherGPT India</h1>
                         <p class="welcome-subtitle">
-                            Accurate weather forecasting, funny alerts, rain radar, climate intelligence, and natural <strong>Manglish</strong> dialogue. <strong>100% Free & Ready to Use — No API key required!</strong>
+                            Dedicated AI weather forecasting, farmer crop advisories, spraying feasibility, soil moisture, and KSDMA disaster alerts for <strong>India</strong>. <strong>100% Free & Ready to Use — No API key required!</strong>
                         </p>
 
                         <div class="welcome-quick-actions">
@@ -279,52 +279,52 @@
                                 <i class="fa-solid fa-location-crosshairs"></i>
                                 <span>My Location Details 📍</span>
                             </button>
-                            <button class="btn-locate-me btn-kochi-quick" id="btn-welcome-kochi" data-prompt="What is the current weather, rain chance, and alerts in Kochi, Kerala?" title="Check Kochi, Kerala Weather, Rain Chances & Alerts">
-                                <i class="fa-solid fa-umbrella"></i>
-                                <span>Kochi Weather & Mazha (Kerala) 🌴</span>
+                            <button class="btn-locate-me btn-kochi-quick" id="btn-welcome-kochi" data-prompt="Can I spray pesticides in Palakkad today? Check wind speed, rain chance, and soil moisture for paddy." title="Check Palakkad Crop Weather & Spraying Feasibility">
+                                <i class="fa-solid fa-spray-can"></i>
+                                <span>Palakkad Spraying & Paddy 🌾</span>
                             </button>
                         </div>
 
                         <div class="welcome-cards-grid">
-                            <div class="feature-card" data-prompt="What's the weather in Tokyo right now? Include hourly forecast and feels like.">
-                                <div class="card-icon"><i class="fa-solid fa-cloud-sun"></i></div>
-                                <h4>Instant Global Forecasts</h4>
-                                <p>Real-time telemetry, 24h interactive curves & 7-day outlooks.</p>
+                            <div class="feature-card" data-prompt="Can I spray pesticide in Palakkad today? Check wind speed, rain probability, and spraying feasibility.">
+                                <div class="card-icon text-emerald"><i class="fa-solid fa-wheat-awn"></i></div>
+                                <h4>Farmer & Crop Advisory</h4>
+                                <p>Spraying feasibility, soil moisture (0-3cm), evapotranspiration & sowing windows.</p>
                             </div>
 
-                            <div class="feature-card" data-prompt="Kochi-yil nale mazha peyyan chance undo? Kuda edukkano?">
-                                <div class="card-icon text-emerald"><i class="fa-solid fa-leaf"></i></div>
-                                <h4>Manglish Natural AI</h4>
-                                <p>Talk naturally in Manglish (Malayalam + English) about local Kerala weather.</p>
+                            <div class="feature-card" data-prompt="Palakkattil innu marunnu thalikkaan pattumo? Mazha peyyumo?">
+                                <div class="card-icon text-cyan"><i class="fa-solid fa-leaf"></i></div>
+                                <h4>Manglish Krishi AI</h4>
+                                <p>Talk naturally in Manglish (Malayalam + English) about local farming & monsoon weather.</p>
                             </div>
 
-                            <div class="feature-card" data-prompt="Are there any severe weather alerts or gale wind warnings in Florida?">
+                            <div class="feature-card" data-prompt="Are there any KSDMA disaster alerts, landslide, or flood warnings in Wayanad and Idukki?">
                                 <div class="card-icon text-amber"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                                <h4>Severe Alerts & Safety</h4>
-                                <p>Detection of heatwaves, storms, gales, frost & safety advisories.</p>
+                                <h4>KSDMA Severe Alerts</h4>
+                                <p>Red/Orange warnings, flash flood/landslide risk, squalls & lightning safety.</p>
                             </div>
 
                             <div class="feature-card" data-prompt="Give me the Air Quality Index (AQI) report and pollutant levels for New Delhi today.">
-                                <div class="card-icon text-cyan"><i class="fa-solid fa-wind"></i></div>
+                                <div class="card-icon text-blue"><i class="fa-solid fa-wind"></i></div>
                                 <h4>Air Quality & AQI</h4>
-                                <p>PM2.5, PM10, ozone, smog levels & actionable health guidance.</p>
+                                <p>PM2.5, PM10, ozone, smog levels & actionable health guidance across India.</p>
                             </div>
                         </div>
 
                         <div class="quick-pills-row">
-                            <span class="pills-label">Suggested English:</span>
-                            <button class="quick-pill" data-prompt="Will it rain in London this weekend?">London weekend rain 🌧️</button>
-                            <button class="quick-pill" data-prompt="Weather in Paris today and what should I wear?">Paris clothing advice 🧥</button>
-                            <button class="quick-pill" data-prompt="Compare the climate of San Francisco vs Seattle">Compare SF vs Seattle 🏙️</button>
-                            <button class="quick-pill" data-prompt="UV index and sun safety advisory for Sydney">Sydney UV index ☀️</button>
+                            <span class="pills-label">🌾 Farmer English:</span>
+                            <button class="quick-pill" data-prompt="Can I spray in Palakkad tomorrow?">Palakkad spraying 🚜</button>
+                            <button class="quick-pill" data-prompt="Soil moisture and irrigation advisory for Wayanad crops">Wayanad soil moisture 💧</button>
+                            <button class="quick-pill" data-prompt="Ludhiana Punjab wheat weather and rain forecast">Ludhiana wheat harvest 🌾</button>
+                            <button class="quick-pill" data-prompt="Nashik grape and onion spraying weather">Nashik crop spray 🍇</button>
                         </div>
 
                         <div class="quick-pills-row mt-2">
-                            <span class="pills-label text-emerald">Manglish (മലയാളം):</span>
+                            <span class="pills-label text-emerald">🌴 Manglish Krishi:</span>
+                            <button class="quick-pill pill-manglish" data-prompt="Palakkattil innu marunnu thalikkaan pattumo?">Palakkad marunnu thalikkal 🚜</button>
                             <button class="quick-pill pill-manglish" data-prompt="Kochi-yil nale mazha peyyumo? Kuda edukkano?">Kochi mazha & kuda 🌧️</button>
-                            <button class="quick-pill pill-manglish" data-prompt="Trivandrum weather engane undu innu? Nalla choodano?">Trivandrum choodu ☀️</button>
-                            <button class="quick-pill pill-manglish" data-prompt="Kozhikode-il innu idi-minnal alerts undo?">Kozhikode alerts ⚡</button>
-                            <button class="quick-pill pill-manglish" data-prompt="Wayanad climate ippo enganeya? Yathrakku nallathano?">Wayanad climate 🌿</button>
+                            <button class="quick-pill pill-manglish" data-prompt="Wayanadile thottam നനയ്ക്കേണ്ട samayam aayo?">Wayanad irrigation 💧</button>
+                            <button class="quick-pill pill-manglish" data-prompt="Kuttanattil koythu samayathu mazha peyyan chance undo?">Kuttanad koythu mazha 🌾</button>
                         </div>
                     </div>
                 </div>

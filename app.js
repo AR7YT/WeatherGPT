@@ -288,6 +288,310 @@ class AtmosphereEngine {
 let atmosphere;
 
 // ============================================================================
+// LIGHTWEIGHT INDIAN NAMED ENTITY RECOGNITION (NER) & AGRI ENGINE
+// ============================================================================
+class IndianNERModel {
+    static KNOWN_FOREIGN_ENTITIES = new Set([
+        'london', 'uk', 'united kingdom', 'england', 'britain', 'tokyo', 'japan', 'kyoto', 'osaka',
+        'paris', 'france', 'new york', 'nyc', 'usa', 'america', 'california', 'florida', 'texas',
+        'chicago', 'los angeles', 'washington', 'seattle', 'san francisco', 'dubai', 'uae',
+        'abu dhabi', 'singapore', 'sydney', 'melbourne', 'australia', 'toronto', 'canada',
+        'vancouver', 'berlin', 'germany', 'frankfurt', 'munich', 'beijing', 'shanghai', 'china',
+        'moscow', 'russia', 'rome', 'italy', 'madrid', 'barcelona', 'spain', 'amsterdam',
+        'doha', 'qatar', 'kuwait', 'riyadh', 'saudi', 'bangkok', 'thailand', 'colombo', 'sri lanka',
+        'lahore', 'karachi', 'pakistan', 'dhaka', 'bangladesh', 'kathmandu', 'nepal', 'seoul', 'korea'
+    ]);
+
+    static INDIAN_AGRI_HUBS = {
+        'palakkad': { name: 'Palakkad', state: 'Kerala', crop: 'Paddy / Rice', lat: 10.7867, lon: 76.6548 },
+        'palghat': { name: 'Palakkad', state: 'Kerala', crop: 'Paddy / Rice', lat: 10.7867, lon: 76.6548 },
+        'wayanad': { name: 'Wayanad', state: 'Kerala', crop: 'Coffee & Spices', lat: 11.6854, lon: 76.1320 },
+        'kuttanad': { name: 'Kuttanad', state: 'Kerala', crop: 'Paddy (Below Sea Level)', lat: 9.5360, lon: 76.4520 },
+        'alappuzha': { name: 'Alappuzha', state: 'Kerala', crop: 'Paddy & Coconut', lat: 9.4981, lon: 76.3388 },
+        'alleppey': { name: 'Alappuzha', state: 'Kerala', crop: 'Paddy & Coconut', lat: 9.4981, lon: 76.3388 },
+        'idukki': { name: 'Idukki', state: 'Kerala', crop: 'Cardamom & Tea', lat: 9.8500, lon: 76.9400 },
+        'munnar': { name: 'Munnar', state: 'Kerala', crop: 'Tea & Spices', lat: 10.0889, lon: 77.0595 },
+        'kochi': { name: 'Kochi', state: 'Kerala', crop: 'Coastal Agri & Fisheries', lat: 9.9312, lon: 76.2673 },
+        'cochin': { name: 'Kochi', state: 'Kerala', crop: 'Coastal Agri & Fisheries', lat: 9.9312, lon: 76.2673 },
+        'ernakulam': { name: 'Kochi', state: 'Kerala', crop: 'Coastal Agri & Fisheries', lat: 9.9816, lon: 76.2999 },
+        'thrissur': { name: 'Thrissur', state: 'Kerala', crop: 'Paddy & Wetlands', lat: 10.5276, lon: 76.2144 },
+        'trichur': { name: 'Thrissur', state: 'Kerala', crop: 'Paddy & Wetlands', lat: 10.5276, lon: 76.2144 },
+        'kozhikode': { name: 'Kozhikode', state: 'Kerala', crop: 'Coconut & Spices', lat: 11.2588, lon: 75.7804 },
+        'calicut': { name: 'Kozhikode', state: 'Kerala', crop: 'Coconut & Spices', lat: 11.2588, lon: 75.7804 },
+        'kottayam': { name: 'Kottayam', state: 'Kerala', crop: 'Rubber & Spices', lat: 9.5916, lon: 76.5222 },
+        'kollam': { name: 'Kollam', state: 'Kerala', crop: 'Cashew & Coconut', lat: 8.8932, lon: 76.6141 },
+        'thiruvananthapuram': { name: 'Thiruvananthapuram', state: 'Kerala', crop: 'Coconut & Tapioca', lat: 8.5241, lon: 76.9366 },
+        'trivandrum': { name: 'Thiruvananthapuram', state: 'Kerala', crop: 'Coconut & Tapioca', lat: 8.5241, lon: 76.9366 },
+        'kannur': { name: 'Kannur', state: 'Kerala', crop: 'Coconut & Pepper', lat: 11.8745, lon: 75.3704 },
+        'kasaragod': { name: 'Kasaragod', state: 'Kerala', crop: 'Areca Nut & Coconut', lat: 12.4996, lon: 74.9869 },
+        'malappuram': { name: 'Malappuram', state: 'Kerala', crop: 'Rubber & Spices', lat: 11.0510, lon: 76.0711 },
+        'ludhiana': { name: 'Ludhiana', state: 'Punjab', crop: 'Wheat & Rice', lat: 30.9010, lon: 75.8573 },
+        'nashik': { name: 'Nashik', state: 'Maharashtra', crop: 'Grapes & Onions', lat: 19.9975, lon: 73.7898 },
+        'thanjavur': { name: 'Thanjavur', state: 'Tamil Nadu', crop: 'Cauvery Delta Paddy', lat: 10.7870, lon: 79.1378 },
+        'guntur': { name: 'Guntur', state: 'Andhra Pradesh', crop: 'Chilli & Cotton', lat: 16.3067, lon: 80.4365 },
+        'delhi': { name: 'New Delhi', state: 'Delhi', crop: 'Urban & Peri-Urban Crops', lat: 28.6139, lon: 77.2090 },
+        'bengaluru': { name: 'Bengaluru', state: 'Karnataka', crop: 'Horticulture & Vegetables', lat: 12.9716, lon: 77.5946 },
+        'bangalore': { name: 'Bengaluru', state: 'Karnataka', crop: 'Horticulture & Vegetables', lat: 12.9716, lon: 77.5946 },
+        'chennai': { name: 'Chennai', state: 'Tamil Nadu', crop: 'Coastal Horticulture', lat: 13.0827, lon: 80.2707 },
+        'mumbai': { name: 'Mumbai', state: 'Maharashtra', crop: 'Coastal Agriculture', lat: 19.0760, lon: 72.8777 },
+        'hyderabad': { name: 'Hyderabad', state: 'Telangana', crop: 'Cotton & Pulses', lat: 17.3850, lon: 78.4867 },
+        'kolkata': { name: 'Kolkata', state: 'West Bengal', crop: 'Jute & Paddy', lat: 22.5726, lon: 88.3639 }
+    };
+
+    static CROPS = [
+        { name: 'Paddy / Rice', keywords: ['paddy', 'rice', 'nellu', 'ari', 'basmati'] },
+        { name: 'Wheat', keywords: ['wheat', 'gothambu', 'gehun'] },
+        { name: 'Rubber', keywords: ['rubber', 'latex', 'sheet'] },
+        { name: 'Cardamom', keywords: ['cardamom', 'elakkaya', 'elam', 'elaichi'] },
+        { name: 'Pepper', keywords: ['pepper', 'kurumulaku', 'black pepper', 'marich'] },
+        { name: 'Coconut', keywords: ['coconut', 'thengu', 'karikku', 'copra'] },
+        { name: 'Banana', keywords: ['banana', 'vazha', 'nendran', 'kela'] },
+        { name: 'Grapes', keywords: ['grapes', 'munthiri', 'angoor'] },
+        { name: 'Chilli', keywords: ['chilli', 'chilly', 'mulaku', 'mirchi'] },
+        { name: 'Cotton', keywords: ['cotton', 'paruthi', 'kapas'] },
+        { name: 'Tea', keywords: ['tea', 'chaya', 'theila', 'chai'] },
+        { name: 'Coffee', keywords: ['coffee', 'kaapi'] },
+        { name: 'Sugarcane', keywords: ['sugarcane', 'karimbu', 'ganna'] }
+    ];
+
+    static ACTIVITIES = [
+        { name: 'Spraying', keywords: ['spray', 'spraying', 'marunnu', 'thalikkan', 'thalikkal', 'pesticide', 'fungicide', 'keedanashini', 'keeda'] },
+        { name: 'Irrigation', keywords: ['irrigate', 'irrigation', 'water', 'watering', 'nanna', 'nannakkan', 'moisture', 'eerappam', 'waterlogging'] },
+        { name: 'Sowing', keywords: ['sow', 'sowing', 'seed', 'vithu', 'vithidal', 'naduka', 'planting'] },
+        { name: 'Harvesting', keywords: ['harvest', 'harvesting', 'koythu', 'koyyan', 'yield', 'cutting'] }
+    ];
+
+    static checkForeign(query) {
+        const clean = query.toLowerCase().replace(/[?!.,;]/g, ' ');
+        for (let f of this.KNOWN_FOREIGN_ENTITIES) {
+            const regex = new RegExp(`\\b${f}\\b`, 'i');
+            if (regex.test(clean)) return f;
+        }
+        return null;
+    }
+
+    static extract(query) {
+        const lower = query.toLowerCase();
+        const clean = lower.replace(/[?!.,;]/g, ' ');
+
+        // 1. Check Foreign
+        const foreignMatch = this.checkForeign(query);
+        if (foreignMatch) {
+            return {
+                isForeign: true,
+                foreignPlace: foreignMatch,
+                location: null,
+                crop: null,
+                activity: null,
+                isAgriQuery: false
+            };
+        }
+
+        // 2. Sandhi normalization for Malayalam suffixes
+        const sandhiMap = {
+            'palakkatt': 'palakkad',
+            'kozhikott': 'kozhikode',
+            'kottayath': 'kottayam',
+            'ernakulath': 'ernakulam',
+            'wayanatt': 'wayanad',
+            'thiruvananthapurath': 'thiruvananthapuram',
+            'alappuzhay': 'alappuzha',
+            'thrissur': 'thrissur',
+            'kannur': 'kannur',
+            'kollath': 'kollam'
+        };
+
+        const words = clean.split(/\s+/);
+        let detectedLoc = null;
+
+        for (let word of words) {
+            const stripped = word.replace(/-(?:yil|il|the|le|nu)$|(?:yil|il|the|le|nu)$/i, '');
+            const normalized = sandhiMap[stripped] || stripped;
+            if (this.INDIAN_AGRI_HUBS[normalized]) {
+                detectedLoc = this.INDIAN_AGRI_HUBS[normalized];
+                break;
+            }
+        }
+
+        // 3. Check Crop
+        let detectedCrop = null;
+        for (let c of this.CROPS) {
+            if (c.keywords.some(k => new RegExp(`\\b${k}\\b`, 'i').test(clean))) {
+                detectedCrop = c.name;
+                break;
+            }
+        }
+
+        // 4. Check Activity
+        let detectedAct = null;
+        for (let a of this.ACTIVITIES) {
+            if (a.keywords.some(k => new RegExp(`\\b${k}\\b`, 'i').test(clean))) {
+                detectedAct = a.name;
+                break;
+            }
+        }
+
+        const isAgriQuery = detectedCrop !== null || detectedAct !== null || 
+            /\b(farmer|karshakan|krishi|agri|agriculture|farm|paddy|soil|irrigation|spray|crop|field|yield|kisan)\b/i.test(clean);
+
+        return {
+            isForeign: false,
+            foreignPlace: null,
+            location: detectedLoc ? detectedLoc.name : null,
+            state: detectedLoc ? detectedLoc.state : 'India',
+            crop: detectedCrop || (detectedLoc ? detectedLoc.crop : 'General Agriculture'),
+            activity: detectedAct || 'General Farm Advisory',
+            isAgriQuery: isAgriQuery,
+            hubInfo: detectedLoc
+        };
+    }
+}
+
+// ============================================================================
+// AGRICULTURAL METEOROLOGY & FARMER ADVISORY ENGINE
+// ============================================================================
+class FarmerAdvisoryEngine {
+    static evaluate(weatherData, nerResult, units = 'metric', isManglish = false) {
+        const cur = weatherData.current || {};
+        const hourly = weatherData.hourly || {};
+        const daily = weatherData.daily || {};
+
+        // 1. Wind & Rain for Spraying
+        const windSpeed = Math.round(cur.wind_speed_10m || 0);
+        const currentPrecip = cur.precipitation || 0;
+        const rainProb = (daily.precipitation_probability_max && daily.precipitation_probability_max[0] !== undefined)
+            ? daily.precipitation_probability_max[0]
+            : (hourly.precipitation_probability ? (hourly.precipitation_probability[0] || 0) : 0);
+        
+        let sprayingStatus = 'safe';
+        let sprayingLabelEn = 'Optimal Window (Safe to Spray)';
+        let sprayingLabelMl = 'Safe Window (Marunnu thalikkaam)';
+        let sprayingDescEn = 'Wind speeds are gentle (<15 km/h) and rain probability is low. Ideal chemical absorption with minimal droplet drift.';
+        let sprayingDescMl = 'Kaattu kuravaanu (<15 km/h), mazha sadyatha illa. Marunnu thalikkal safe aanu.';
+
+        if (currentPrecip > 0 || rainProb >= 50 || windSpeed >= 22) {
+            sprayingStatus = 'danger';
+            sprayingLabelEn = 'Unfavourable (Do Not Spray)';
+            sprayingLabelMl = 'Not Recommended (Ippo thalikkalle)';
+            if (currentPrecip > 0 || rainProb >= 50) {
+                sprayingDescEn = 'High probability of rain or active precipitation will wash off chemicals/pesticides.';
+                sprayingDescMl = 'Mazha peyyan nalla chance undu. Marunnu ozhuki pokum, marunnu adikkalle!';
+            } else {
+                sprayingDescEn = `High wind speeds (${windSpeed} km/h) will cause severe droplet drift and pesticide wastage.`;
+                sprayingDescMl = `Katta kaattu (${windSpeed} km/h) உள்ளതുകൊണ്ട് marunnu parannu pokum.`;
+            }
+        } else if (windSpeed >= 15 || rainProb >= 25) {
+            sprayingStatus = 'warning';
+            sprayingLabelEn = 'Caution Window (Spray with Care)';
+            sprayingLabelMl = 'Moderate Window (Sradhichu mathram)';
+            sprayingDescEn = `Moderate wind (${windSpeed} km/h) or borderline rain risk (${rainProb}%). Spray early morning or late evening with anti-drift nozzles.`;
+            sprayingDescMl = `Kurachu kaatto mazhakkolo undu (${rainProb}%). Ravile or vaikitt thalikkan sradhikkuka.`;
+        }
+
+        // 2. Soil Moisture & Temperature (0-1cm topsoil & 1-3cm root layer)
+        const soilMoistRaw = (hourly.soil_moisture_0_to_1cm && hourly.soil_moisture_0_to_1cm[0] !== undefined)
+            ? hourly.soil_moisture_0_to_1cm[0]
+            : 0.22;
+        const soilMoist13Raw = (hourly.soil_moisture_1_to_3cm && hourly.soil_moisture_1_to_3cm[0] !== undefined)
+            ? hourly.soil_moisture_1_to_3cm[0]
+            : 0.25;
+        const soilTempRaw = (hourly.soil_temperature_0cm && hourly.soil_temperature_0cm[0] !== undefined)
+            ? hourly.soil_temperature_0cm[0]
+            : (cur.temperature_2m ? cur.temperature_2m - 1 : 27);
+
+        const soilMoisture0_1 = Math.round(soilMoistRaw * 100);
+        const soilMoisture1_3 = Math.round(soilMoist13Raw * 100);
+        const soilTemp = Math.round(soilTempRaw);
+
+        let soilCondition = 'Optimal Moisture';
+        let soilConditionMl = 'Nalla Eerappam';
+        if (soilMoisture0_1 < 15) {
+            soilCondition = 'Dry / Depleted Topsoil';
+            soilConditionMl = 'Topsoil Vranjathanu (Dry)';
+        } else if (soilMoisture0_1 > 35) {
+            soilCondition = 'Saturated / Wet Ground';
+            soilConditionMl = 'Kooduthal Vellakkettu (Wet)';
+        }
+
+        // 3. FAO ET0 Evapotranspiration & Irrigation Requirement
+        const et0 = (daily.et0_fao_evapotranspiration && daily.et0_fao_evapotranspiration[0] !== undefined)
+            ? Number(daily.et0_fao_evapotranspiration[0]).toFixed(1)
+            : '4.2';
+        
+        let irrigationNeed = 'Moderate / Routine Irrigation';
+        let irrigationNeedMl = 'Sadharana Nanna Mathi';
+        let irrigationAdviceEn = `Atmospheric evapotranspiration loss is ${et0} mm/day. Maintain regular soil moisture.`;
+        let irrigationAdviceMl = `Evapotranspiration loss ${et0} mm/day aanu. Regular nanna continue cheyyam.`;
+
+        if (currentPrecip > 2 || rainProb >= 60) {
+            irrigationNeed = 'Postpone Irrigation';
+            irrigationNeedMl = 'Nannakkenda (Mazha sadyatha)';
+            irrigationAdviceEn = 'Natural precipitation forecast is adequate. Conserve ground water and avoid root waterlogging.';
+            irrigationAdviceMl = 'Mazha peyyan sadyathayund. Vellam ozhikkan ninnu pokuka, waterlogging ozhuvakkuka.';
+        } else if (soilMoisture0_1 < 18 || Number(et0) >= 5.0) {
+            irrigationNeed = 'High Irrigation Needed';
+            irrigationNeedMl = 'Kooduthal Nannakkanam';
+            irrigationAdviceEn = `High solar radiation and high crop water loss (${et0} mm/day). Water fields during early morning to minimize loss.`;
+            irrigationAdviceMl = `Katta veyilum eerappakshayavum (${et0} mm/day). Ravile thanne nanna nalkuka.`;
+        }
+
+        // 4. Crop Specific Action
+        const crop = nerResult.crop || 'Paddy / General Crops';
+        const activity = nerResult.activity || 'Field Maintenance';
+        let cropTipEn = `Monitor drainage and maintain field bunds for ${crop}. Keep pest surveillance active.`;
+        let cropTipMl = `${crop}-ku drainage canals vrithiyaakki vekkuka. Keeda nireekshanam nadathuka.`;
+
+        if (crop.toLowerCase().includes('paddy') || crop.toLowerCase().includes('rice') || crop.toLowerCase().includes('nellu')) {
+            if (rainProb > 50) {
+                cropTipEn = 'Ensure sluice gates and drainage channels are open to prevent sub-surface water stagnation in paddy fields.';
+                cropTipMl = 'Paddy paadangalil vellam ketti nilkkathirikkan drainage channels theliyikkuka.';
+            } else {
+                cropTipEn = 'Maintain 2-5cm standing water layer in paddy plots during panicle development stages.';
+                cropTipMl = 'Nellu kathiridunna samayathu 2-5cm vellam paadathu ketti nirthuka.';
+            }
+        } else if (crop.toLowerCase().includes('rubber')) {
+            if (rainProb > 40) {
+                cropTipEn = 'Affix rainguards over tapping cuts to prevent fungal strip rot disease (Phytophthora) during showers.';
+                cropTipMl = 'Mazha varunnathinu munpu rubber marangalkku rainguard fittaakki Phytophthora thadanyuka.';
+            } else {
+                cropTipEn = 'Early morning tapping yields optimal latex flow; clear latex cups before midday heat.';
+                cropTipMl = 'Ravile veluppine tapping nadathiyaal nalla latex kitti tharum.';
+            }
+        } else if (crop.toLowerCase().includes('cardamom') || crop.toLowerCase().includes('pepper')) {
+            if (rainProb > 50) {
+                cropTipEn = 'Watch for quick wilt and fungal rots in high humidity. Ensure soil aeration around root bases.';
+                cropTipMl = 'Kurumulakil/elathil thiruvizha rogam thadayan root area vrithiyakki drenching nalkuka.';
+            }
+        }
+
+        return {
+            crop: crop,
+            activity: activity,
+            spraying: {
+                status: sprayingStatus,
+                badgeText: isManglish ? sprayingLabelMl : sprayingLabelEn,
+                desc: isManglish ? sprayingDescMl : sprayingDescEn,
+                windSpeed: windSpeed,
+                rainChance: rainProb
+            },
+            soilMoisture: {
+                moisture0_1: soilMoisture0_1,
+                moisture1_3: soilMoisture1_3,
+                temp0cm: soilTemp,
+                condition: isManglish ? soilConditionMl : soilCondition
+            },
+            irrigation: {
+                need: isManglish ? irrigationNeedMl : irrigationNeed,
+                et0: et0,
+                advice: isManglish ? irrigationAdviceMl : irrigationAdviceEn
+            },
+            cropTip: isManglish ? cropTipMl : cropTipEn,
+            kisanHelpline: '1800-180-1551'
+        };
+    }
+}
+
+// ============================================================================
 // METEOROLOGICAL API SERVICE (OPEN-METEO)
 class WeatherService {
     static async reverseGeocode(latitude, longitude) {
@@ -344,6 +648,12 @@ class WeatherService {
 
     static async searchCity(query) {
         try {
+            // 0. Foreign entity check via IndianNERModel
+            const foreignCheck = IndianNERModel.checkForeign(query);
+            if (foreignCheck) {
+                return { isForeignLocation: true, queriedName: foreignCheck };
+            }
+
             // 1. Direct GPS coordinate matching (e.g. "latitude 28.613, longitude 77.209" or "37.77, -122.41")
             const coordMatch = query.match(/(?:lat|latitude)[\s:=]+([+-]?\d+(?:\.\d+)?)[,\s]+(?:lon|long|longitude)[\s:=]+([+-]?\d+(?:\.\d+)?)/i);
             if (coordMatch) {
@@ -361,20 +671,33 @@ class WeatherService {
                 return rev;
             }
 
-            // 2. Clean query and check aliases
+            // 2. Clean query and check Indian NER Hubs & Aliases
             let cleanQuery = query.replace(/[?!.]/g, '').trim();
             const lowerQuery = cleanQuery.toLowerCase();
-            const isJapanExplicit = lowerQuery.includes('japan') || lowerQuery.includes('jp');
 
-            // 2a. Check if directly in pinned Kerala locations (100% guarantees Kochi is in Kerala, India)
-            const strippedForPinned = lowerQuery.replace(/\b(weather|in|at|for|climate|mazha|choodu|forecast|kerala|city|town)\b/g, '').trim();
-            if (!isJapanExplicit) {
-                if (PINNED_KERALA_LOCATIONS[lowerQuery]) {
-                    return { ...PINNED_KERALA_LOCATIONS[lowerQuery] };
-                }
-                if (PINNED_KERALA_LOCATIONS[strippedForPinned]) {
-                    return { ...PINNED_KERALA_LOCATIONS[strippedForPinned] };
-                }
+            // Direct match from Indian NER Hubs
+            const ner = IndianNERModel.extract(query);
+            if (ner.location && IndianNERModel.INDIAN_AGRI_HUBS[ner.location.toLowerCase()]) {
+                const hub = IndianNERModel.INDIAN_AGRI_HUBS[ner.location.toLowerCase()];
+                return {
+                    name: hub.name,
+                    admin1: hub.state,
+                    country: "India",
+                    country_code: "IN",
+                    latitude: hub.lat,
+                    longitude: hub.lon,
+                    elevation: 10,
+                    timezone: "auto"
+                };
+            }
+
+            // Check if directly in pinned Kerala locations
+            const strippedForPinned = lowerQuery.replace(/\b(weather|in|at|for|climate|mazha|choodu|forecast|kerala|city|town|krishi|farm|paddy)\b/g, '').trim();
+            if (PINNED_KERALA_LOCATIONS[lowerQuery]) {
+                return { ...PINNED_KERALA_LOCATIONS[lowerQuery] };
+            }
+            if (PINNED_KERALA_LOCATIONS[strippedForPinned]) {
+                return { ...PINNED_KERALA_LOCATIONS[strippedForPinned] };
             }
 
             if (KERALA_CITY_ALIASES[lowerQuery]) {
@@ -389,33 +712,28 @@ class WeatherService {
             const data = await res.json();
             if (!data.results || data.results.length === 0) return null;
 
-            // 3a. Disambiguation: if query is Kochi or Kerala-related and NOT explicit Japan, prioritize Kerala/India
-            if (isJapanExplicit) {
-                const japanMatch = data.results.find(r => r.country_code === 'JP' || r.country === 'Japan');
-                if (japanMatch) return japanMatch;
-            } else {
-                // Priority 1: Match in Kerala, India
-                const keralaMatch = data.results.find(r => 
-                    (r.country_code === 'IN' || r.country === 'India') && 
-                    (r.admin1 === 'Kerala' || (r.name && r.name.toLowerCase() === 'kochi'))
-                );
-                if (keralaMatch) {
-                    return {
-                        ...keralaMatch,
-                        name: keralaMatch.name === 'Kōchi' ? 'Kochi' : keralaMatch.name,
-                        admin1: 'Kerala',
-                        country: 'India'
-                    };
-                }
+            // Strict filter to India (country_code === 'IN' or country === 'India')
+            const indiaResults = data.results.filter(r => r.country_code === 'IN' || r.country === 'India');
 
-                // Priority 2: Match in India for Kochi/Cochin queries
-                if (lowerQuery.includes('kochi') || lowerQuery.includes('cochin')) {
-                    const indiaMatch = data.results.find(r => r.country_code === 'IN' || r.country === 'India');
-                    if (indiaMatch) return indiaMatch;
-                }
+            if (indiaResults.length === 0) {
+                // If there are results but none in India, it's a foreign location!
+                return { isForeignLocation: true, queriedName: data.results[0].name || cleanQuery };
             }
 
-            return data.results[0];
+            // Priority 1: Match in Kerala, India
+            const keralaMatch = indiaResults.find(r => 
+                r.admin1 === 'Kerala' || (r.name && r.name.toLowerCase() === 'kochi')
+            );
+            if (keralaMatch) {
+                return {
+                    ...keralaMatch,
+                    name: keralaMatch.name === 'Kōchi' ? 'Kochi' : keralaMatch.name,
+                    admin1: 'Kerala',
+                    country: 'India'
+                };
+            }
+
+            return indiaResults[0];
         } catch (err) {
             console.error('Geocoding error:', err);
             return null;
@@ -429,8 +747,8 @@ class WeatherService {
 
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
             `&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m` +
-            `&hourly=temperature_2m,relative_humidity_2m,dew_point_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,surface_pressure,visibility,wind_speed_10m,uv_index` +
-            `&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,sunrise,sunset,uv_index_max,precipitation_sum,precipitation_hours,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max` +
+            `&hourly=temperature_2m,relative_humidity_2m,dew_point_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,surface_pressure,visibility,wind_speed_10m,uv_index,soil_temperature_0cm,soil_moisture_0_to_1cm,soil_moisture_1_to_3cm` +
+            `&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,sunrise,sunset,uv_index_max,precipitation_sum,precipitation_hours,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,et0_fao_evapotranspiration` +
             `&timezone=${timezone}&temperature_unit=${tempUnit}&wind_speed_unit=${windUnit}&precipitation_unit=${precipUnit}`;
 
         const res = await fetch(url);
@@ -918,6 +1236,11 @@ class WeatherGPTEngine {
             return { type: 'disaster', query: prompt };
         }
 
+        // 3d. Agriculture, Farmer Advisory & Crop Weather
+        if (lower.includes('spray') || lower.includes('pesticide') || lower.includes('marunnu') || lower.includes('thalikka') || lower.includes('soil moisture') || lower.includes('irrigation') || lower.includes('nanna') || lower.includes('eerappam') || lower.includes('paddy') || lower.includes('rice') || lower.includes('nellu') || lower.includes('wheat') || lower.includes('rubber') || lower.includes('cardamom') || lower.includes('pepper') || lower.includes('kurumulaku') || lower.includes('harvest') || lower.includes('koythu') || lower.includes('sow') || lower.includes('vithu') || lower.includes('krishi') || lower.includes('farmer') || lower.includes('karshakan') || lower.includes('kisan')) {
+            return { type: 'farmer', query: prompt };
+        }
+
         // 4. Severe Alerts (English + Manglish)
         if (lower.includes('alert') || lower.includes('warning') || lower.includes('severe') || lower.includes('storm') || lower.includes('tornado') || lower.includes('hurricane') || lower.includes('minnal') || lower.includes('jagratha')) {
             return { type: 'alert', query: prompt };
@@ -943,6 +1266,12 @@ class WeatherGPTEngine {
     }
 
     static extractCity(prompt) {
+        // 0. Lightweight Indian NER location lookup
+        const ner = IndianNERModel.extract(prompt);
+        if (ner.location) {
+            return ner.location;
+        }
+
         // 1. Coordinates check
         const coordMatch = prompt.match(/(?:lat|latitude)[\s:=]+([+-]?\d+(?:\.\d+)?)[,\s]+(?:lon|long|longitude)[\s:=]+([+-]?\d+(?:\.\d+)?)/i);
         if (coordMatch) {
@@ -973,7 +1302,7 @@ class WeatherGPTEngine {
             'mazha', 'choodu', 'kuda', 'nale', 'innu', 'ippo', 'keralam',
             'disaster', 'disasters', 'management', 'flood', 'landslide', 'earthquake',
             'helpline', 'emergency', 'location', 'details', 'my location', 'specs', 'status',
-            'idms', 'idm', 'ksdma'
+            'idms', 'idm', 'ksdma', 'farmer', 'krishi', 'spraying', 'spray', 'paddy', 'irrigation', 'soil', 'moisture', 'kisan'
         ]);
 
         const matches = [...prompt.matchAll(/\b(?:in|at|for|near)\s+([A-Za-z\s\.-]+?)(?=(?:\s+(?:today|tomorrow|right now|this weekend|next week|with|and|give|please|innu|nale|ippo)|[?!.,;]|$))/gi)];
@@ -1740,6 +2069,129 @@ class UIRenderer {
         `;
         return card;
     }
+
+    static createFarmerAdvisoryCard(city, weatherData, disasterRisk, agriEval, nerResult, isManglish = false) {
+        const card = document.createElement('div');
+        card.className = 'farmer-advisory-card';
+
+        const crop = agriEval.crop;
+        const spraying = agriEval.spraying;
+        const soil = agriEval.soilMoisture;
+        const irr = agriEval.irrigation;
+
+        let sprayingClass = 'spraying-safe';
+        let sprayingIcon = 'fa-circle-check';
+        if (spraying.status === 'warning') {
+            sprayingClass = 'spraying-warning';
+            sprayingIcon = 'fa-triangle-exclamation';
+        } else if (spraying.status === 'danger') {
+            sprayingClass = 'spraying-danger';
+            sprayingIcon = 'fa-circle-xmark';
+        }
+
+        const soilPercentClamped = Math.max(5, Math.min(100, soil.moisture0_1));
+
+        card.innerHTML = `
+            <div class="farmer-card-header">
+                <div class="farmer-title-group">
+                    <i class="fa-solid fa-seedling text-emerald"></i>
+                    <div>
+                        <h3>${isManglish ? 'Krishi & Farmer Weather Advisory 🌾' : 'Agricultural & Farmer Meteorology 🌾'}</h3>
+                        <span class="farmer-subtitle">${city.name} (${city.admin1 || 'India'}) • High-Resolution Agro-NWP Analysis</span>
+                    </div>
+                </div>
+                <div class="farmer-badge-row">
+                    <span class="crop-tag"><i class="fa-solid fa-wheat-awn"></i> ${crop}</span>
+                    <span class="spraying-badge ${sprayingClass}"><i class="fa-solid ${sprayingIcon}"></i> ${spraying.badgeText}</span>
+                </div>
+            </div>
+
+            <div class="agri-grid">
+                <div class="agri-metric-tile">
+                    <span class="agri-metric-label"><i class="fa-solid fa-spray-can text-cyan"></i> ${isManglish ? 'Marunnu Thalikkal (Spraying)' : 'Spraying Window'}</span>
+                    <span class="agri-metric-value" style="font-size: 0.88rem;">${spraying.desc}</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">Wind: ${spraying.windSpeed} km/h • Rain Chance: ${spraying.rainChance}%</span>
+                </div>
+
+                <div class="agri-metric-tile">
+                    <span class="agri-metric-label"><i class="fa-solid fa-droplet text-blue"></i> ${isManglish ? 'Mannile Eerappam (Topsoil)' : 'Topsoil Moisture (0-1cm)'}</span>
+                    <span class="agri-metric-value">${soil.moisture0_1}% <span style="font-size: 0.8rem; font-weight: 500; color: var(--text-secondary);">(${soil.condition})</span></span>
+                    <div class="soil-meter-bar">
+                        <div class="soil-meter-fill" style="width: ${soilPercentClamped}%;"></div>
+                    </div>
+                    <span style="font-size: 0.72rem; color: var(--text-muted); margin-top: 4px;">Root Layer (1-3cm): ${soil.moisture1_3}% • Soil Temp: ${soil.temp0cm}°C</span>
+                </div>
+
+                <div class="agri-metric-tile">
+                    <span class="agri-metric-label"><i class="fa-solid fa-cloud-sun-rain text-gold"></i> ${isManglish ? 'Nanna (Irrigation) & ET₀' : 'Irrigation & ET₀'}</span>
+                    <span class="agri-metric-value" style="font-size: 0.88rem;">${irr.need}</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">FAO ET₀: ${irr.et0} mm/day • ${irr.advice}</span>
+                </div>
+            </div>
+
+            <div class="farmer-action-box">
+                <div class="farmer-action-title">
+                    <i class="fa-solid fa-lightbulb"></i>
+                    <span>${isManglish ? 'Karshakarkkulla Pradhana Nirdheshangal' : 'Actionable Crop & Field Directives'}</span>
+                </div>
+                <ul class="farmer-action-list">
+                    <li><i class="fa-solid fa-check"></i> <span><strong>${crop}</strong>: ${agriEval.cropTip}</span></li>
+                    <li><i class="fa-solid fa-shield-halved"></i> <span>${isManglish ? 'KSDMA Severe Weather Alerts: 100% monitored. Kooduthal details thazhe review cheyyam.' : 'Multi-hazard civil defense protocol monitored via KSDMA & IMD color-coded alert matrix.'}</span></li>
+                </ul>
+            </div>
+
+            <div class="farmer-helpline-bar">
+                <span style="font-size: 0.78rem; color: var(--text-muted);">
+                    <i class="fa-solid fa-building-columns"></i> Ministry of Agriculture & Farmers Welfare, Govt of India
+                </span>
+                <a href="tel:18001801551" class="kisan-pill" title="Toll-Free Kisan Call Centre">
+                    <i class="fa-solid fa-phone-volume"></i> Kisan Call Centre: 1800-180-1551 (Toll-Free)
+                </a>
+            </div>
+        `;
+
+        return card;
+    }
+
+    static createIndiaBoundaryCard(queriedName, isManglish = false) {
+        const card = document.createElement('div');
+        card.className = 'india-boundary-card';
+
+        const placeDisplay = queriedName ? (queriedName.charAt(0).toUpperCase() + queriedName.slice(1)) : 'Requested Location';
+
+        card.innerHTML = `
+            <div class="india-boundary-header">
+                <i class="fa-solid fa-flag text-gold" style="font-size: 1.4rem;"></i>
+                <div>
+                    <h3 style="margin: 0;">${isManglish ? 'India-Exclusive Krishi & Weather Platform 🇮🇳' : 'India-Exclusive Meteorological & Agricultural Platform 🇮🇳'}</h3>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">WeatherGPT is dedicated exclusively to India's agricultural hubs, farmers & citizens</span>
+                </div>
+            </div>
+            <div class="india-boundary-msg">
+                ${isManglish 
+                    ? `WeatherGPT <strong>"${placeDisplay}"</strong> oru foreign location aayathinaal report cheyyilla. Ee platform <strong>India-yile</strong> karshakarum janangalum vendi mathram specialized cheytha meteorological engine aanu (High-resolution Indian NWP, soil moisture, spraying feasibility, KSDMA alerts).`
+                    : `WeatherGPT does not provide data for <strong>"${placeDisplay}"</strong> because foreign locations are outside our scope. This platform is strictly tailored for <strong>India</strong>—serving farmers, agricultural workers, and citizens with high-resolution land-surface telemetry, soil moisture, spraying feasibility windows, and disaster warnings.`}
+            </div>
+            <div class="india-presets-title">${isManglish ? 'Thazheyulla Indian Krishi Kendrangal try cheyyu:' : 'Explore these top Indian agricultural regions:'}</div>
+            <div class="india-presets-grid">
+                <button class="topic-chip" data-prompt="Palakkad spraying feasibility & paddy forecast"><i class="fa-solid fa-seedling text-emerald"></i> Palakkad (Paddy)</button>
+                <button class="topic-chip" data-prompt="Wayanad soil moisture & coffee advisory"><i class="fa-solid fa-mountain text-teal"></i> Wayanad (Coffee & Pepper)</button>
+                <button class="topic-chip" data-prompt="Kuttanad paddy harvest weather"><i class="fa-solid fa-water text-blue"></i> Kuttanad (Rice)</button>
+                <button class="topic-chip" data-prompt="Ludhiana wheat farm conditions"><i class="fa-solid fa-wheat-awn text-gold"></i> Ludhiana (Wheat)</button>
+                <button class="topic-chip" data-prompt="Nashik grape spraying window"><i class="fa-solid fa-wine-glass text-rose"></i> Nashik (Grapes)</button>
+            </div>
+        `;
+
+        card.querySelectorAll('button[data-prompt]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const text = btn.getAttribute('data-prompt');
+                if (chatManager) chatManager.handleSend(text);
+            });
+        });
+
+        return card;
+    }
 }
 
 // ============================================================================
@@ -1905,6 +2357,20 @@ class ChatManager {
     async processWithBuiltInEngine(query) {
         const isManglish = WeatherGPTEngine.isManglish(query);
         const intent = WeatherGPTEngine.detectIntent(query);
+        const ner = IndianNERModel.extract(query);
+
+        // 0. Foreign location boundary check
+        if (ner.isForeign) {
+            const boundaryCard = UIRenderer.createIndiaBoundaryCard(ner.foreignPlace, isManglish);
+            this.addAssistantMessage(
+                isManglish
+                    ? `WeatherGPT <strong>"${ner.foreignPlace}"</strong> oru foreign location aayathinaal support cheyyilla. Ee engine <strong>India-yile</strong> karshakarkkum janangalkkum vendi mathram specialized cheythathaanu.`
+                    : `WeatherGPT is dedicated exclusively to **India's agricultural and civil meteorological telemetry**. Foreign location **"${ner.foreignPlace}"** is not supported.`,
+                [boundaryCard],
+                isManglish
+            );
+            return;
+        }
 
         // 0a. GREETINGS & CASUAL OPENERS
         if (intent.type === 'greeting') {
@@ -1917,14 +2383,14 @@ Ivide njan 24x7 real-time satellite radar-um numerical weather prediction models
 * ⚡ **100% Free**: API key onnum type cheyyenda, direct aayi use cheyyam!
 
 Etha sthalam nokkendathu? Chodhicho! 😊`
-                : `### Hello there! 👋🌤️
-I am **WeatherGPT**, your friendly conversational AI meteorologist! I'm monitoring global NWP atmospheric telemetry in real-time.
+                : `### Namaste & Welcome! 👋🌾
+I am **WeatherGPT India**, your dedicated AI Agricultural Meteorologist and Krishi Advisory assistant! I monitor high-resolution NWP models, soil moisture, and rainfall telemetry exclusively across India.
 
-* 📍 **Any location worldwide**: e.g., *"Kochi weather"*, *"Tokyo 7-day forecast"*, *"Will it rain in London?"*
-* ☀️ **Friendly & Funny Alerts**: Ask *"Is it too hot outside?"* or *"Will it rain today?"*
-* ⚡ **100% Free & Ready**: Zero API key or configuration required for anyone!
+* 📍 **Any location across India**: e.g., *"Palakkad spraying feasibility"*, *"Wayanad soil moisture"*, *"Ludhiana wheat harvest forecast"*, *"Kochi rain"*
+* 🚜 **Farmer Advisories**: Ask *"Can I spray pesticide today?"*, *"Is irrigation required?"*, or *"Check KSDMA disaster alerts"*
+* ⚡ **100% Free & Open**: Instant access for all farmers and citizens without any API key!
 
-Which city would you like to check today?`;
+Which Indian district, city, or village would you like to check today?`;
 
             this.addAssistantMessage(greetingNarrative, [], isManglish);
             return;
@@ -2011,23 +2477,35 @@ A world-class conversational AI meteorologist powered by real-time Open-Meteo Eu
         }
 
         // 3. SINGLE CITY QUERIES
-        const cityName = WeatherGPTEngine.extractCity(query);
-        this.showTyping(`Locating "${cityName}" via Open-Meteo High-Resolution Geocoding...`);
+        const cityName = ner.location || WeatherGPTEngine.extractCity(query);
+        this.showTyping(`Locating "${cityName}" via High-Resolution Indian Geocoding...`);
 
         const city = await WeatherService.searchCity(cityName);
         if (!city) {
             this.addAssistantMessage(
                 isManglish 
-                    ? `**"${cityName}"** enna sthalam find cheyyaan pattiyilla bro. Spelling onnu check cheythittu parayamo?`
-                    : `I could not pinpoint **"${cityName}"** in the global meteorological registry. Could you please specify a country or check spelling?`,
+                    ? `**"${cityName}"** enna sthalam India-yil find cheyyaan pattiyilla bro. Spelling onnu check cheythittu parayamo?`
+                    : `I could not pinpoint **"${cityName}"** within India. Please check spelling or specify an Indian district.`,
                 [],
                 isManglish
             );
             return;
         }
 
+        if (city.isForeignLocation) {
+            const boundaryCard = UIRenderer.createIndiaBoundaryCard(city.queriedName, isManglish);
+            this.addAssistantMessage(
+                isManglish
+                    ? `WeatherGPT <strong>"${city.queriedName}"</strong> oru foreign location aayathinaal support cheyyilla. Ee engine <strong>India-yile</strong> karshakarkkum janangalkkum vendi mathram specialized cheythathaanu.`
+                    : `WeatherGPT is dedicated exclusively to **India's agricultural and civil meteorological telemetry**. Foreign location **"${city.queriedName}"** is not supported.`,
+                [boundaryCard],
+                isManglish
+            );
+            return;
+        }
+
         state.activeCity = city;
-        const locationDisplay = `${city.name}${city.admin1 && city.admin1 !== city.name ? ', ' + city.admin1 : ''}${city.country ? ', ' + city.country : ''}`;
+        const locationDisplay = `${city.name}${city.admin1 && city.admin1 !== city.name ? ', ' + city.admin1 : ''}, India`;
         document.getElementById('active-location-name').textContent = locationDisplay;
 
         this.showTyping(`Fetching high-resolution NWP models & air quality for ${city.name}...`);
@@ -2042,6 +2520,7 @@ A world-class conversational AI meteorologist powered by real-time Open-Meteo Eu
 
         const detectedAlerts = AlertDetector.detect(weatherData, aqiData, state.units, isManglish);
         const disasterRisk = DisasterService.evaluateDisasterRisk(weatherData, aqiData, city, isManglish);
+        const agriEval = FarmerAdvisoryEngine.evaluate(weatherData, ner, state.units, isManglish);
         const tempUnit = state.units === 'imperial' ? '°F' : '°C';
         const windUnit = state.units === 'imperial' ? 'mph' : 'km/h';
         const cur = weatherData.current;
@@ -2049,6 +2528,37 @@ A world-class conversational AI meteorologist powered by real-time Open-Meteo Eu
 
         let narrative = "";
         let widgets = [];
+
+        // 3a. Agricultural / Krishi & Farmer Advisory (Top Priority)
+        if (intent.type === 'farmer' || ner.isAgriQuery) {
+            narrative = isManglish
+                ? `### 🌾 **Krishi & Farmer Meteorological Advisory: ${city.name}**\n` +
+                  `* 🚜 **Pradhana Vilakal / Crop**: **${agriEval.crop}** (${ner.activity})\n` +
+                  `* 💨 **Marunnu Thalikkal (Spraying)**: **${agriEval.spraying.badgeText}** — ${agriEval.spraying.desc}\n` +
+                  `* 💧 **Mannile Eerappam (Topsoil Moisture)**: **${agriEval.soilMoisture.moisture0_1}%** (${agriEval.soilMoisture.condition})\n` +
+                  `* ☀️ **Nanna (Irrigation) & ET₀**: **${agriEval.irrigation.need}** (FAO ET₀: ${agriEval.irrigation.et0} mm/day)\n` +
+                  `* 🚨 **KSDMA Warning Status**: **${disasterRisk.badge}**\n\n` +
+                  `**Karshakarkkulla Directives**:\n* ${agriEval.cropTip}\n\n` +
+                  `Detailed soil moisture telemetry, spraying parameters, and official Kisan Call Centre hotline thazhe cards-il review cheyyam:`
+                : `### 🌾 **Krishi & Agricultural Meteorological Advisory: ${locationDisplay}**\n` +
+                  `* 🚜 **Target Crop / Focus**: **${agriEval.crop}** (${ner.activity})\n` +
+                  `* 💨 **Chemical & Pesticide Spraying**: **${agriEval.spraying.badgeText}** — ${agriEval.spraying.desc}\n` +
+                  `* 💧 **Topsoil Moisture (0-1cm)**: **${agriEval.soilMoisture.moisture0_1}%** (${agriEval.soilMoisture.condition})\n` +
+                  `* ☀️ **Irrigation Scheduling & ET₀**: **${agriEval.irrigation.need}** (Evapotranspiration: ${agriEval.irrigation.et0} mm/day)\n` +
+                  `* 🚨 **Civil Protection / Disaster Status**: **${disasterRisk.badge}**\n\n` +
+                  `**Agronomic Directive**:\n* ${agriEval.cropTip}\n\n` +
+                  `Complete agro-meteorological telemetry, soil moisture graphs, and Kisan Call Centre hotlines are compiled below:`;
+
+            widgets.push(UIRenderer.createFarmerAdvisoryCard(city, weatherData, disasterRisk, agriEval, ner, isManglish));
+            if (disasterRisk.level === 'red' || disasterRisk.level === 'orange') {
+                widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, isManglish));
+            }
+            widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
+            widgets.push(UIRenderer.createHourlyCard(weatherData, state.units));
+            widgets.push(UIRenderer.createDailyCard(weatherData, state.units));
+            this.addAssistantMessage(narrative, widgets, isManglish);
+            return;
+        }
 
         // If Manglish query or mode, use tailored Manglish generator
         if (isManglish) {
@@ -2187,17 +2697,44 @@ A world-class conversational AI meteorologist powered by real-time Open-Meteo Eu
 
     async processWithExternalLLM(query) {
         const isManglish = WeatherGPTEngine.isManglish(query);
-        const cityName = WeatherGPTEngine.extractCity(query);
+        const ner = IndianNERModel.extract(query);
+
+        // 0. Foreign boundary check
+        if (ner.isForeign) {
+            const boundaryCard = UIRenderer.createIndiaBoundaryCard(ner.foreignPlace, isManglish);
+            this.addAssistantMessage(
+                isManglish
+                    ? `WeatherGPT <strong>"${ner.foreignPlace}"</strong> oru foreign location aayathinaal support cheyyilla. Ee engine <strong>India-yile</strong> karshakarkkum janangalkkum vendi mathram specialized cheythathaanu.`
+                    : `WeatherGPT is dedicated exclusively to **India's agricultural and civil meteorological telemetry**. Foreign location **"${ner.foreignPlace}"** is not supported.`,
+                [boundaryCard],
+                isManglish
+            );
+            return;
+        }
+
+        const cityName = ner.location || WeatherGPTEngine.extractCity(query);
         const city = await WeatherService.searchCity(cityName);
 
-        if (!city) {
+        if (!city || city.isForeignLocation) {
+            if (city && city.isForeignLocation) {
+                const boundaryCard = UIRenderer.createIndiaBoundaryCard(city.queriedName, isManglish);
+                this.addAssistantMessage(
+                    isManglish
+                        ? `WeatherGPT <strong>"${city.queriedName}"</strong> oru foreign location aayathinaal support cheyyilla. Ee engine <strong>India-yile</strong> karshakarkkum janangalkkum vendi mathram specialized cheythathaanu.`
+                        : `WeatherGPT is dedicated exclusively to **India's agricultural and civil meteorological telemetry**. Foreign location **"${city.queriedName}"** is not supported.`,
+                    [boundaryCard],
+                    isManglish
+                );
+                return;
+            }
             const narrative = await this.callLLMDirect(query, null, isManglish);
             this.addAssistantMessage(narrative, [], isManglish);
             return;
         }
 
         state.activeCity = city;
-        document.getElementById('active-location-name').textContent = `${city.name}, ${city.country || ''}`;
+        const locationDisplay = `${city.name}${city.admin1 && city.admin1 !== city.name ? ', ' + city.admin1 : ''}, India`;
+        document.getElementById('active-location-name').textContent = locationDisplay;
 
         const [weatherData, aqiData] = await Promise.all([
             WeatherService.getForecast(city.latitude, city.longitude, city.timezone, state.units),
@@ -2206,29 +2743,59 @@ A world-class conversational AI meteorologist powered by real-time Open-Meteo Eu
 
         const intent = WeatherGPTEngine.detectIntent(query);
         const disasterRisk = DisasterService.evaluateDisasterRisk(weatherData, aqiData, city, isManglish);
+        const agriEval = FarmerAdvisoryEngine.evaluate(weatherData, ner, state.units, isManglish);
 
+        // Construct live JSON data payload for Gemini/LLM
         const telemetryContext = {
-            city: `${city.name}, ${city.country || ''}`,
-            coordinates: `${city.latitude}, ${city.longitude}`,
-            elevation_meters: city.elevation !== undefined ? city.elevation : 15,
+            location: locationDisplay,
+            coordinates: `${Number(city.latitude).toFixed(4)}° N, ${Number(city.longitude).toFixed(4)}° E`,
+            elevation_meters: city.elevation !== undefined ? Math.round(city.elevation) : 15,
             units: state.units,
-            current_temperature: weatherData.current.temperature_2m,
-            apparent_temperature: weatherData.current.apparent_temperature,
-            weather_condition: getWmoInfo(weatherData.current.weather_code).desc,
-            humidity_percent: weatherData.current.relative_humidity_2m,
-            wind_speed: weatherData.current.wind_speed_10m,
-            daily_high: weatherData.daily.temperature_2m_max[0],
-            daily_low: weatherData.daily.temperature_2m_min[0],
-            rain_probability_max: weatherData.daily.precipitation_probability_max ? weatherData.daily.precipitation_probability_max[0] : 0,
-            aqi: aqiData && aqiData.current ? aqiData.current.us_aqi : 'unknown',
-            disaster_warning_level: disasterRisk.level.toUpperCase(),
-            disaster_badge: disasterRisk.badge,
-            disaster_hazards: disasterRisk.hazards
+            crop: ner.crop,
+            farming_activity: ner.activity,
+            spraying_feasibility: {
+                status: agriEval.spraying.status.toUpperCase(),
+                label: agriEval.spraying.badgeText,
+                wind_speed: `${agriEval.spraying.windSpeed} km/h`,
+                rain_chance: `${agriEval.spraying.rainChance}%`,
+                advice: agriEval.spraying.desc
+            },
+            soil_telemetry: {
+                topsoil_moisture_0_to_1cm_percent: `${agriEval.soilMoisture.moisture0_1}%`,
+                root_moisture_1_to_3cm_percent: `${agriEval.soilMoisture.moisture1_3}%`,
+                soil_temperature_0cm: `${agriEval.soilMoisture.temp0cm}°C`,
+                soil_condition: agriEval.soilMoisture.condition
+            },
+            evapotranspiration_fao_et0: `${agriEval.irrigation.et0} mm/day`,
+            irrigation_recommendation: agriEval.irrigation.need,
+            crop_directive: agriEval.cropTip,
+            current_weather: {
+                temperature: Math.round(weatherData.current.temperature_2m),
+                apparent_temperature: Math.round(weatherData.current.apparent_temperature),
+                condition: getWmoInfo(weatherData.current.weather_code).desc,
+                humidity_percent: weatherData.current.relative_humidity_2m,
+                wind_speed: `${Math.round(weatherData.current.wind_speed_10m)} km/h`,
+                precipitation_mm: weatherData.current.precipitation
+            },
+            forecast_today: {
+                high: Math.round(weatherData.daily.temperature_2m_max[0]),
+                low: Math.round(weatherData.daily.temperature_2m_min[0]),
+                rain_probability_max_percent: weatherData.daily.precipitation_probability_max ? weatherData.daily.precipitation_probability_max[0] : 0,
+                rain_sum_mm: weatherData.daily.precipitation_sum ? weatherData.daily.precipitation_sum[0] : 0
+            },
+            disaster_management_ksdma: {
+                level: disasterRisk.level.toUpperCase(),
+                badge: disasterRisk.badge,
+                hazards: disasterRisk.hazards
+            },
+            kisan_call_centre_helpline: "1800-180-1551 (Toll-Free, Ministry of Agriculture, Govt of India)"
         };
 
         const llmNarrative = await this.callLLMDirect(query, telemetryContext, isManglish);
 
         const widgets = [];
+        widgets.push(UIRenderer.createFarmerAdvisoryCard(city, weatherData, disasterRisk, agriEval, ner, isManglish));
+
         if (intent.type === 'location_details') {
             widgets.push(UIRenderer.createLocationDetailsCard(city, weatherData, disasterRisk, isManglish));
             widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, isManglish));
@@ -2244,15 +2811,20 @@ A world-class conversational AI meteorologist powered by real-time Open-Meteo Eu
     }
 
     async callLLMDirect(query, context, isManglish = false) {
-        let systemPrompt = `You are WeatherGPT, a world-class conversational AI meteorologist and atmospheric scientist. Ground your answers strictly in the provided real-time telemetry numbers whenever available.\nTelemetry: ${context ? JSON.stringify(context) : 'None'}`;
+        let systemPrompt = `You are WeatherGPT India, an expert Agricultural Meteorologist and Krishi Advisory AI specializing exclusively in India.
+Ground your answers strictly in the provided real-time NWP telemetry numbers, agricultural land-surface data, and disaster indices.
+Guide farmers and citizens with practical advice: pesticide/fertilizer spraying feasibility, soil moisture levels, irrigation necessity based on FAO ET0, crop protection, and severe weather warnings.
+Always provide courteous, actionable guidance. Mention the Kisan Call Centre (1800-180-1551) for free agronomic support.
+Live Telemetry & Agricultural JSON: ${context ? JSON.stringify(context, null, 2) : 'None'}`;
 
         if (isManglish) {
-            systemPrompt = `You are WeatherGPT, a witty, warm, and friendly conversational AI meteorologist who speaks fluent natural Manglish (Malayalam written in English script) as spoken in Kerala, India.
+            systemPrompt = `You are WeatherGPT India, a witty, warm, and expert Agricultural Meteorologist & Krishi Advisory AI who speaks fluent natural Manglish (Malayalam written in English script) as spoken in Kerala, India.
 Rules for Manglish responses:
-1. Speak in friendly, natural, conversational Manglish (e.g. "Aliya, Kochi-yil ippo 31°C undu, nalla humidity-yum choodum aanu...", "Nale vaikitt nalla mazha peyyan 70% chance undu, oru kuda kayyil karuthiyeko!").
-2. Accurately incorporate the provided real-time telemetry numbers (temperature, feels-like, rain probability %, humidity, wind speed, alerts).
-3. Provide practical lifestyle advice (umbrella, hydration, clothing, safety during lightning).
-Telemetry: ${context ? JSON.stringify(context) : 'None'}`;
+1. Speak in friendly, natural, conversational Manglish (e.g. "Aliya, Palakkattil ippo 32°C undu, kaattu 11 km/h mathramullathinaal marunnu thalikkan safe window aanu...", "Soil moisture 22% aanu, ippozhe kooduthal nanna venda...").
+2. Accurately incorporate the provided real-time telemetry numbers (temperature, feels-like, rain probability %, humidity, wind speed, soil moisture %, FAO ET0, alerts).
+3. Provide practical farming & lifestyle advice (spraying feasibility, irrigation scheduling, crop protection, umbrella, hydration, safety during lightning/landslide alerts).
+4. Remind farmers about the Kisan Call Centre: 1800-180-1551 if relevant.
+Live Telemetry & Agricultural JSON: ${context ? JSON.stringify(context, null, 2) : 'None'}`;
         }
 
         if (state.llmProvider === 'gemini') {
@@ -3020,14 +3592,14 @@ function renderSavedCities() {
     list.innerHTML = '';
 
     if (state.savedCities.length === 0) {
-        // Kerala + World metropolises
+        // Indian Agricultural & Regional Hubs
         const defaultCities = [
-            { name: "Kochi", country: "Kerala, India" },
-            { name: "Thiruvananthapuram", country: "Kerala, India" },
-            { name: "Kozhikode", country: "Kerala, India" },
-            { name: "Wayanad", country: "Kerala, India" },
-            { name: "London", country: "United Kingdom" },
-            { name: "Tokyo", country: "Japan" }
+            { name: "Kochi", country: "Kerala (Coastal & Spices)" },
+            { name: "Palakkad", country: "Kerala (Rice Bowl / Paddy)" },
+            { name: "Wayanad", country: "Kerala (Coffee & Spices)" },
+            { name: "Thiruvananthapuram", country: "Kerala" },
+            { name: "Ludhiana", country: "Punjab (Wheat / Granary)" },
+            { name: "Nashik", country: "Maharashtra (Grapes & Onions)" }
         ];
 
         defaultCities.forEach(c => {
