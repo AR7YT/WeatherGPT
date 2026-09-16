@@ -571,6 +571,37 @@
                     </div>
                 </div>
 
+                <!-- DISASTER NOTIFICATIONS (WHATSAPP & SMS) -->
+                <div class="setting-group">
+                    <label class="setting-label"><i class="fa-solid fa-bell text-rose"></i> Disaster Alert Notifications (WhatsApp & SMS)</label>
+                    <p class="setting-hint">Configure automatic prompts and primary emergency contacts for KSDMA disaster warnings.</p>
+
+                    <div class="toggle-row mt-2">
+                        <div>
+                            <label class="setting-label" style="font-size: 0.85rem;">Auto-Prompt Disaster Broadcast</label>
+                            <p class="setting-hint">Automatically prompt emergency WhatsApp & SMS dispatch when Red or Orange Alert is detected</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-auto-disaster-alert" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <label class="setting-label mt-3" for="input-emergency-contacts">Emergency Contact Phone Number</label>
+                    <input type="tel" id="input-emergency-contacts" class="settings-input" placeholder="+91 98765 43210 (Optional recipient)" />
+                    <p class="setting-hint">Pre-filled when dispatching WhatsApp and SMS disaster alerts.</p>
+
+                    <label class="setting-label mt-3" for="input-sms-gateway-url">Automated Webhook Gateway (Optional)</label>
+                    <input type="url" id="input-sms-gateway-url" class="settings-input" placeholder="https://your-sms-gateway-webhook.com/api" />
+                    <p class="setting-hint">Optional URL to POST automated JSON payloads on severe alerts (e.g. Fast2SMS / Twilio webhook).</p>
+
+                    <div class="mt-3">
+                        <button type="button" id="btn-test-disaster-alert" class="btn-secondary-sm" style="width: 100%; justify-content: center; padding: 0.65rem 1rem;">
+                            <i class="fa-solid fa-vial"></i> Test Disaster Alert (WhatsApp & SMS)
+                        </button>
+                    </div>
+                </div>
+
                 <!-- DATA SOURCES INFO -->
                 <div class="setting-group-info">
                     <h4>Meteorological Telemetry Sources</h4>
@@ -647,6 +678,49 @@
                         <i class="fa-solid fa-arrows-rotate"></i>
                         <span>Refresh</span>
                     </button>
+                </div>
+
+                <!-- WHATSAPP & SMS EMERGENCY DISPATCH CENTER -->
+                <div class="disaster-section-box disaster-broadcast-box">
+                    <div class="disaster-box-header">
+                        <h4><i class="fa-solid fa-tower-broadcast text-rose"></i> Emergency WhatsApp & SMS Broadcast Center</h4>
+                        <span class="disaster-hint-tag">1-Tap Citizen Alert</span>
+                    </div>
+                    <div class="broadcast-body">
+                        <p class="broadcast-desc">Instantly dispatch official KSDMA disaster alerts with live telemetry, flood/landslide risk levels, and 24/7 emergency helplines directly to your family, farmer groups, or panchayat disaster response teams.</p>
+                        
+                        <div class="broadcast-recipient-row">
+                            <div class="recipient-input-wrap">
+                                <i class="fa-solid fa-phone text-muted"></i>
+                                <input type="tel" id="broadcast-phone-input" placeholder="Recipient Phone Number (Optional, e.g. +91 98765 43210)" />
+                            </div>
+                        </div>
+
+                        <div class="broadcast-preview-box">
+                            <div class="broadcast-preview-header">
+                                <span><i class="fa-regular fa-message"></i> Alert Message Preview</span>
+                                <span class="preview-badge" id="broadcast-preview-badge">KSDMA Alert</span>
+                            </div>
+                            <textarea id="broadcast-message-preview" class="broadcast-textarea" rows="5" readonly></textarea>
+                        </div>
+
+                        <div class="broadcast-actions-grid">
+                            <button type="button" id="btn-broadcast-whatsapp" class="btn-broadcast-wa">
+                                <i class="fa-brands fa-whatsapp"></i>
+                                <div>
+                                    <strong>Share Alert via WhatsApp</strong>
+                                    <span>Send to WhatsApp chats & farmer groups</span>
+                                </div>
+                            </button>
+                            <button type="button" id="btn-broadcast-sms" class="btn-broadcast-sms">
+                                <i class="fa-solid fa-comment-sms"></i>
+                                <div>
+                                    <strong>Send Emergency SMS</strong>
+                                    <span>Open native cellular SMS messenger</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- EMERGENCY HELPLINES DIRECTORY -->
@@ -887,6 +961,30 @@ console.log(weather, disaster, location, quakes);</code></pre>
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLOATING EMERGENCY DISASTER DISPATCH BANNER -->
+    <div id="emergency-dispatch-banner" class="emergency-dispatch-banner hidden" role="alert">
+        <div class="emergency-banner-content">
+            <div id="emergency-banner-icon" class="emergency-banner-icon pulse-red">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="emergency-banner-text">
+                <strong id="emergency-banner-title">🔴 KSDMA RED ALERT: Extreme Disaster Danger!</strong>
+                <span id="emergency-banner-desc">Broadcast emergency alert via WhatsApp & SMS:</span>
+            </div>
+            <div class="emergency-banner-actions">
+                <button type="button" class="btn-banner-wa" id="banner-btn-wa">
+                    <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                </button>
+                <button type="button" class="btn-banner-sms" id="banner-btn-sms">
+                    <i class="fa-solid fa-comment-sms"></i> SMS
+                </button>
+                <button type="button" class="btn-banner-dismiss" id="banner-btn-close" title="Dismiss">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
         </div>
     </div>

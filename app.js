@@ -111,6 +111,9 @@ const state = {
     apiKey: localStorage.getItem('weathergpt_apikey') || '',
     language: localStorage.getItem('weathergpt_lang') || 'auto', // 'auto', 'manglish', 'english'
     autoVoice: localStorage.getItem('weathergpt_autovoice') === 'true',
+    emergencyContacts: localStorage.getItem('weathergpt_emergency_contacts') || '',
+    autoEmergencyAlert: localStorage.getItem('weathergpt_auto_emergency_alert') !== 'false', // default true
+    smsGatewayUrl: localStorage.getItem('weathergpt_sms_gateway_url') || '',
     savedCities: JSON.parse(localStorage.getItem('weathergpt_saved_cities') || '[]'),
     recentQueries: JSON.parse(localStorage.getItem('weathergpt_recent') || '[]'),
     activeCity: null,
@@ -1104,6 +1107,197 @@ class DisasterService {
 }
 
 // ============================================================================
+// EMERGENCY DISASTER NOTIFICATION SERVICE (WHATSAPP & SMS BROADCAST)
+// ============================================================================
+
+class EmergencyNotificationService {
+    static formatAlertMessage(disaster, location, weatherData = null, isManglish = false) {
+        const cur = (weatherData && weatherData.current) || {};
+        const daily = (weatherData && weatherData.daily) || {};
+        const locName = (location && (location.name || location.locality)) || (state.activeCity ? state.activeCity.name : 'Current Region');
+        const stateName = (location && (location.admin1 || location.district)) || 'Kerala, India';
+        
+        let levelIcon = '🔴';
+        let levelLabelEn = 'RED ALERT: EXTREME DISASTER WARNING';
+        let levelLabelMl = 'RED ALERT: അതീവ ജാഗ്രതാ നിർദ്ദേശം';
+
+        if (disaster.level === 'orange') {
+            levelIcon = '🟠';
+            levelLabelEn = 'ORANGE ALERT: SEVERE WEATHER WARNING';
+            levelLabelMl = 'ORANGE ALERT: ജാഗ്രതാ നിർദ്ദേശം';
+        } else if (disaster.level === 'yellow') {
+            levelIcon = '🟡';
+            levelLabelEn = 'YELLOW ALERT: WEATHER WATCH';
+            levelLabelMl = 'YELLOW ALERT: നിരീക്ഷണ മുന്നറിയിപ്പ്';
+        } else if (disaster.level === 'green') {
+            levelIcon = '🟢';
+            levelLabelEn = 'GREEN STATUS: NORMAL BASELINE';
+            levelLabelMl = 'GREEN STATUS: സുരക്ഷിതം';
+        }
+
+        const levelText = isManglish ? levelLabelMl : levelLabelEn;
+        const temp = cur.temperature_2m ? `${Math.round(cur.temperature_2m)}°C` : '';
+        const wind = cur.wind_speed_10m ? `${Math.round(cur.wind_speed_10m)} km/h` : (disaster.wind ? `${Math.round(disaster.wind)} km/h` : '');
+        const rainProb = (daily.precipitation_probability_max && daily.precipitation_probability_max[0] !== undefined) 
+            ? `${daily.precipitation_probability_max[0]}%` 
+            : '';
+        const rainSum = disaster.rainSum !== undefined ? `${Number(disaster.rainSum).toFixed(1)} mm` : '';
+
+        const hazardSummary = (disaster.hazards || []).map(h => `• ${h.name}: ${h.value}`).join('\n');
+        const actionsSummary = (disaster.actions || []).slice(0, 3).map(a => `• ${a}`).join('\n');
+
+        if (isManglish) {
+            return `🚨 *KSDMA DISASTER MANAGEMENT EMERGENCY ALERT* 🚨\n` +
+                `⚠️ *Munnariyippu*: ${levelIcon} ${levelText}\n` +
+                `📍 *Sthalam*: ${locName}, ${stateName}\n\n` +
+                `📊 *Live Telemetry*:\n` +
+                (temp ? `• Choodu / Temp: ${temp}\n` : '') +
+                (wind ? `• Kaattu / Wind: ${wind}\n` : '') +
+                (rainProb ? `• Mazha Sadyatha / Rain Chance: ${rainProb}\n` : '') +
+                (rainSum ? `• 24h Mazha / Rain Sum: ${rainSum}\n` : '') +
+                (hazardSummary ? `${hazardSummary}\n` : '') +
+                `\n🛡️ *Pradhana Nirdheshangal*:\n` +
+                (actionsSummary || '• Vellappokka, urulpottal sadyathayulla sthalangalil ninnu maruka.\n• Emergency numbers ready aakki vekkuka.') +
+                `\n\n📞 *Official Helplines (24x7)*:\n` +
+                `• National Emergency: 112\n` +
+                `• District Disaster: 1077\n` +
+                `• State KSDMA: 1070\n` +
+                `• Fire & Rescue: 101\n` +
+                `• Kisan Call Centre: 1800-180-1551\n\n` +
+                `— Sent via WeatherGPT India Krishi & Disaster Warning System`;
+        }
+
+        return `🚨 *KSDMA DISASTER MANAGEMENT EMERGENCY ALERT* 🚨\n` +
+            `⚠️ *Warning Level*: ${levelIcon} ${levelText}\n` +
+            `📍 *Location*: ${locName}, ${stateName}\n\n` +
+            `📊 *Live Telemetry Breakdown*:\n` +
+            (temp ? `• Surface Temp: ${temp}\n` : '') +
+            (wind ? `• Wind Velocity: ${wind}\n` : '') +
+            (rainProb ? `• Rain Probability: ${rainProb}\n` : '') +
+            (rainSum ? `• 24h Rainfall Total: ${rainSum}\n` : '') +
+            (hazardSummary ? `${hazardSummary}\n` : '') +
+            `\n🛡️ *Civil Defense & Safety Guidelines*:\n` +
+            (actionsSummary || '• Avoid waterlogged lowlands, rivers, and landslide-prone hill slopes.\n• Keep emergency go-bag and battery banks charged.') +
+            `\n\n📞 *Official 24x7 Emergency SOS Numbers*:\n` +
+            `• Unified National Emergency: 112\n` +
+            `• District Disaster (DDMA): 1077\n` +
+            `• State Emergency Operations (KSDMA): 1070\n` +
+            `• Fire & Rescue: 101 | Ambulance: 108\n` +
+            `• Kisan Call Centre: 1800-180-1551\n\n` +
+            `— Sent via WeatherGPT India Krishi & Disaster Management System`;
+    }
+
+    static getWhatsAppUrl(text, phone = '') {
+        const cleanPhone = (phone || state.emergencyContacts || '').replace(/[^\d]/g, '');
+        if (cleanPhone && cleanPhone.length >= 10) {
+            const intlPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
+            return `https://api.whatsapp.com/send?phone=${intlPhone}&text=${encodeURIComponent(text)}`;
+        }
+        return `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    }
+
+    static getSmsUrl(text, phone = '') {
+        const cleanPhone = (phone || state.emergencyContacts || '').replace(/[^\d+]/g, '');
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const separator = isIOS ? '&' : '?';
+        return `sms:${cleanPhone || ''}${separator}body=${encodeURIComponent(text)}`;
+    }
+
+    static shareWhatsApp(text, phone = '') {
+        const url = this.getWhatsAppUrl(text, phone);
+        window.open(url, '_blank', 'noopener,noreferrer');
+        showToast("Opening WhatsApp with emergency disaster alert...");
+    }
+
+    static sendSms(text, phone = '') {
+        const url = this.getSmsUrl(text, phone);
+        window.location.href = url;
+        showToast("Opening SMS app with pre-filled emergency alert...");
+    }
+
+    static async dispatchAutomatedAlert(disaster, location, weatherData = null, isManglish = false) {
+        if (!disaster || (disaster.level !== 'red' && disaster.level !== 'orange')) return;
+
+        const text = this.formatAlertMessage(disaster, location, weatherData, isManglish);
+
+        // Optional webhook POST
+        if (state.smsGatewayUrl) {
+            try {
+                fetch(state.smsGatewayUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        event: 'KSDMA_DISASTER_ALERT',
+                        level: disaster.level,
+                        location: location.name || 'Current Location',
+                        message: text,
+                        contacts: state.emergencyContacts,
+                        timestamp: new Date().toISOString()
+                    })
+                }).catch(err => console.warn("Automated gateway webhook error:", err));
+            } catch (e) {
+                console.warn("Automated webhook dispatch skipped:", e);
+            }
+        }
+
+        // Display the floating emergency dispatch banner
+        this.showDisasterNotificationBanner(disaster, location, text);
+    }
+
+    static showDisasterNotificationBanner(disaster, location, messageText) {
+        let banner = document.getElementById('emergency-dispatch-banner');
+        if (!banner) return;
+
+        const isRed = disaster.level === 'red';
+        const locName = (location && location.name) || (state.activeCity ? state.activeCity.name : 'Your Area');
+
+        banner.innerHTML = `
+            <div class="emergency-banner-content">
+                <div class="emergency-banner-icon ${isRed ? 'pulse-red' : 'pulse-orange'}">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div class="emergency-banner-text">
+                    <strong>${isRed ? '🔴 KSDMA RED ALERT: Extreme Disaster Danger!' : '🟠 KSDMA ORANGE ALERT: Severe Weather Threat!'}</strong>
+                    <span>Broadcast emergency alert for <strong>${locName}</strong> via WhatsApp & SMS:</span>
+                </div>
+                <div class="emergency-banner-actions">
+                    <button type="button" class="btn-banner-wa" id="banner-btn-wa">
+                        <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                    </button>
+                    <button type="button" class="btn-banner-sms" id="banner-btn-sms">
+                        <i class="fa-solid fa-comment-sms"></i> SMS
+                    </button>
+                    <button type="button" class="btn-banner-dismiss" id="banner-btn-close" title="Dismiss">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        banner.classList.remove('hidden');
+
+        const btnWa = document.getElementById('banner-btn-wa');
+        const btnSms = document.getElementById('banner-btn-sms');
+        const btnClose = document.getElementById('banner-btn-close');
+
+        if (btnWa) {
+            btnWa.addEventListener('click', () => {
+                EmergencyNotificationService.shareWhatsApp(messageText);
+            });
+        }
+        if (btnSms) {
+            btnSms.addEventListener('click', () => {
+                EmergencyNotificationService.sendSms(messageText);
+            });
+        }
+        if (btnClose) {
+            btnClose.addEventListener('click', () => {
+                banner.classList.add('hidden');
+            });
+        }
+    }
+}
+
+// ============================================================================
 // CLIMATE KNOWLEDGE BASE & SCIENTIFIC INTELLIGENCE
 // ============================================================================
 
@@ -2009,7 +2203,7 @@ class UIRenderer {
         return card;
     }
 
-    static createDisasterCard(disaster, location, isManglish = false) {
+    static createDisasterCard(disaster, location, isManglish = false, weatherData = null) {
         const card = document.createElement('div');
         card.className = `disaster-management-card disaster-card-${disaster.level}`;
 
@@ -2066,9 +2260,40 @@ class UIRenderer {
                     <i class="fa-solid fa-fire-extinguisher"></i> 101 (Fire & Rescue)
                 </a>
             </div>
+
+            <div class="disaster-dispatch-row">
+                <div class="dispatch-title">
+                    <i class="fa-solid fa-tower-broadcast"></i> ${isManglish ? 'തത്സമയ മുന്നറിയിപ്പ് അയക്കുക (Broadcast)' : 'Live Citizen Alert Broadcast'}:
+                </div>
+                <div class="dispatch-btn-group">
+                    <button type="button" class="btn-wa-broadcast quick-pill" data-action="wa-broadcast">
+                        <i class="fa-brands fa-whatsapp"></i> ${isManglish ? 'WhatsApp വഴി അയക്കുക' : 'Share WhatsApp'}
+                    </button>
+                    <button type="button" class="btn-sms-broadcast quick-pill" data-action="sms-broadcast">
+                        <i class="fa-solid fa-comment-sms"></i> ${isManglish ? 'SMS അയക്കുക' : 'Send SMS'}
+                    </button>
+                </div>
+            </div>
         `;
+
+        const btnWa = card.querySelector('[data-action="wa-broadcast"]');
+        const btnSms = card.querySelector('[data-action="sms-broadcast"]');
+        if (btnWa) {
+            btnWa.addEventListener('click', () => {
+                const msg = EmergencyNotificationService.formatAlertMessage(disaster, location, weatherData, isManglish);
+                EmergencyNotificationService.shareWhatsApp(msg);
+            });
+        }
+        if (btnSms) {
+            btnSms.addEventListener('click', () => {
+                const msg = EmergencyNotificationService.formatAlertMessage(disaster, location, weatherData, isManglish);
+                EmergencyNotificationService.sendSms(msg);
+            });
+        }
+
         return card;
     }
+
 
     static createFarmerAdvisoryCard(city, weatherData, disasterRisk, agriEval, nerResult, isManglish = false) {
         const card = document.createElement('div');
@@ -2521,6 +2746,11 @@ A world-class conversational AI meteorologist powered by real-time Open-Meteo Eu
         const detectedAlerts = AlertDetector.detect(weatherData, aqiData, state.units, isManglish);
         const disasterRisk = DisasterService.evaluateDisasterRisk(weatherData, aqiData, city, isManglish);
         const agriEval = FarmerAdvisoryEngine.evaluate(weatherData, ner, state.units, isManglish);
+
+        // Automated emergency dispatch trigger for Red & Orange alerts
+        if ((disasterRisk.level === 'red' || disasterRisk.level === 'orange') && state.autoEmergencyAlert) {
+            EmergencyNotificationService.dispatchAutomatedAlert(disasterRisk, city, weatherData, isManglish);
+        }
         const tempUnit = state.units === 'imperial' ? '°F' : '°C';
         const windUnit = state.units === 'imperial' ? 'mph' : 'km/h';
         const cur = weatherData.current;
@@ -2551,7 +2781,7 @@ A world-class conversational AI meteorologist powered by real-time Open-Meteo Eu
 
             widgets.push(UIRenderer.createFarmerAdvisoryCard(city, weatherData, disasterRisk, agriEval, ner, isManglish));
             if (disasterRisk.level === 'red' || disasterRisk.level === 'orange') {
-                widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, isManglish));
+                widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, isManglish, weatherData));
             }
             widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
             widgets.push(UIRenderer.createHourlyCard(weatherData, state.units));
@@ -2571,7 +2801,7 @@ A world-class conversational AI meteorologist powered by real-time Open-Meteo Eu
                     `* 🛡️ **Disaster Risk Level**: **${disasterRisk.badge}**\n\n` +
                     `Ivideyulla complete geographic specs, disaster vulnerability, and weather telemetry thazhe cards-il review cheyyam:`;
                 widgets.push(UIRenderer.createLocationDetailsCard(city, weatherData, disasterRisk, true));
-                widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, true));
+                widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, true, weatherData));
                 widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
                 widgets.push(UIRenderer.createHourlyCard(weatherData, state.units));
                 this.addAssistantMessage(narrative, widgets, true);
@@ -2586,7 +2816,7 @@ A world-class conversational AI meteorologist powered by real-time Open-Meteo Eu
                     `* ⛰️ **Topography / Elevation**: ${city.elevation !== undefined ? Math.round(city.elevation) + 'm ASL' : 'Lowland / Coastal'}\n\n` +
                     `**Hazard Telemetry Summary**:\n${hazardDetails}\n\n` +
                     `Actionable safety directives, emergency SOS hotlines, and weather curves thazhe kodukkunnu:`;
-                widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, true));
+                widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, true, weatherData));
                 widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
                 widgets.push(UIRenderer.createHourlyCard(weatherData, state.units));
                 this.addAssistantMessage(narrative, widgets, true);
@@ -2595,7 +2825,7 @@ A world-class conversational AI meteorologist powered by real-time Open-Meteo Eu
 
             narrative = WeatherGPTEngine.generateManglishBriefing(city, weatherData, aqiData, detectedAlerts, intent);
             if (disasterRisk.level === 'red' || disasterRisk.level === 'orange') {
-                widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, true));
+                widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, true, weatherData));
             }
             if (detectedAlerts.length > 0) widgets.push(UIRenderer.createAlertCards(detectedAlerts));
             widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
@@ -2623,7 +2853,7 @@ A world-class conversational AI meteorologist powered by real-time Open-Meteo Eu
                 `* 🛡️ **Civil Protection Status**: **${disasterRisk.badge}**\n\n` +
                 `Complete geographic profile, disaster vulnerability, and atmospheric metrics are detailed below:`;
             widgets.push(UIRenderer.createLocationDetailsCard(city, weatherData, disasterRisk, false));
-            widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, false));
+            widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, false, weatherData));
             widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
             widgets.push(UIRenderer.createHourlyCard(weatherData, state.units));
             this.addAssistantMessage(narrative, widgets, false);
@@ -2636,7 +2866,7 @@ A world-class conversational AI meteorologist powered by real-time Open-Meteo Eu
                 `* ⛰️ **Topography**: ${city.elevation !== undefined ? Math.round(city.elevation) + 'm Elevation' : 'Coastal / Lowland'}\n\n` +
                 `**Hazard Telemetry Breakdown**:\n${hazardDetails}\n\n` +
                 `Actionable civil defense guidelines, 1-tap emergency SOS helplines, and forecast curves are compiled below:`;
-            widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, false));
+            widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, false, weatherData));
             widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
             widgets.push(UIRenderer.createHourlyCard(weatherData, state.units));
             this.addAssistantMessage(narrative, widgets, false);
@@ -2648,7 +2878,7 @@ A world-class conversational AI meteorologist powered by real-time Open-Meteo Eu
             widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
         } else if (intent.type === 'alert') {
             if (disasterRisk.level === 'red' || disasterRisk.level === 'orange') {
-                widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, false));
+                widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, false, weatherData));
             }
             if (detectedAlerts.length > 0) {
                 narrative = `### ⚠️ Meteorological Alerts for **${locationDisplay}**\n${alertHighlight}Review the actionable safety tips and advisory below:`;
@@ -2662,27 +2892,27 @@ A world-class conversational AI meteorologist powered by real-time Open-Meteo Eu
         } else if (intent.type === 'lifestyle') {
             const advice = WeatherGPTEngine.generateLifestyleAdvice(cur, daily, state.units);
             narrative = `### Meteorological Lifestyle & Clothing Advisory for **${locationDisplay}**\n${alertHighlight}Currently **${Math.round(cur.temperature_2m)}${tempUnit}** (feels like **${Math.round(cur.apparent_temperature)}${tempUnit}**) with *${wmo.desc}*.\n\n🧥 **What To Wear**:\n${advice.clothing.map(c => `* ${c}`).join('\n')}\n\n🎒 **Gear & Essentials**:\n${advice.gear.length > 0 ? advice.gear.map(g => `* ${g}`).join('\n') : '* Standard day-wear is sufficient; no specialized wet-weather gear required.'}\n\n🏃 **Outdoor Activity Suitability**:\n* ${advice.outdoorAdvice}`;
-            if (disasterRisk.level === 'red' || disasterRisk.level === 'orange') widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, false));
+            if (disasterRisk.level === 'red' || disasterRisk.level === 'orange') widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, false, weatherData));
             if (detectedAlerts.length > 0) widgets.push(UIRenderer.createAlertCards(detectedAlerts));
             widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
             widgets.push(UIRenderer.createHourlyCard(weatherData, state.units));
         } else if (intent.type === 'forecast') {
             narrative = `### 7-Day Atmospheric Outlook for **${locationDisplay}**\n${alertHighlight}The upcoming synoptic pattern shows a diurnal high of **${Math.round(daily.temperature_2m_max[0])}${tempUnit}** and overnight low of **${Math.round(daily.temperature_2m_min[0])}${tempUnit}**.`;
-            if (disasterRisk.level === 'red' || disasterRisk.level === 'orange') widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, false));
+            if (disasterRisk.level === 'red' || disasterRisk.level === 'orange') widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, false, weatherData));
             if (detectedAlerts.length > 0) widgets.push(UIRenderer.createAlertCards(detectedAlerts));
             widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
             widgets.push(UIRenderer.createDailyCard(weatherData, state.units));
             widgets.push(UIRenderer.createHourlyCard(weatherData, state.units));
         } else if (intent.type === 'hourly') {
             narrative = `### 24-Hour Diurnal Progression for **${locationDisplay}**\n${alertHighlight}Review the interactive temperature curve and precipitation probability below. Peak temperature will reach **${Math.round(daily.temperature_2m_max[0])}${tempUnit}**.`;
-            if (disasterRisk.level === 'red' || disasterRisk.level === 'orange') widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, false));
+            if (disasterRisk.level === 'red' || disasterRisk.level === 'orange') widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, false, weatherData));
             if (detectedAlerts.length > 0) widgets.push(UIRenderer.createAlertCards(detectedAlerts));
             widgets.push(UIRenderer.createHourlyCard(weatherData, state.units));
             widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
         } else {
             const rainMax = daily.precipitation_probability_max ? daily.precipitation_probability_max[0] : 0;
             narrative = `### Meteorological Briefing: **${locationDisplay}**\n${alertHighlight}* **Current Conditions**: **${Math.round(cur.temperature_2m)}${tempUnit}** • *${wmo.desc}* (Feels like **${Math.round(cur.apparent_temperature)}${tempUnit}**)\n* **Diurnal Range**: Expected high of **${Math.round(daily.temperature_2m_max[0])}${tempUnit}** and overnight low of **${Math.round(daily.temperature_2m_min[0])}${tempUnit}**.\n* **Precipitation Risk**: Maximum rain chance today is **${rainMax}%** with humidity at **${cur.relative_humidity_2m}%**.\n* **Wind**: Surface winds blowing at **${Math.round(cur.wind_speed_10m)} ${windUnit}** from the **${UIRenderer.getWindDirection(cur.wind_direction_10m)}**.`;
-            if (disasterRisk.level === 'red' || disasterRisk.level === 'orange') widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, false));
+            if (disasterRisk.level === 'red' || disasterRisk.level === 'orange') widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, false, weatherData));
             if (detectedAlerts.length > 0) widgets.push(UIRenderer.createAlertCards(detectedAlerts));
             widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
             widgets.push(UIRenderer.createHourlyCard(weatherData, state.units));
@@ -2745,6 +2975,11 @@ A world-class conversational AI meteorologist powered by real-time Open-Meteo Eu
         const disasterRisk = DisasterService.evaluateDisasterRisk(weatherData, aqiData, city, isManglish);
         const agriEval = FarmerAdvisoryEngine.evaluate(weatherData, ner, state.units, isManglish);
 
+        // Automated emergency dispatch trigger for Red & Orange alerts
+        if ((disasterRisk.level === 'red' || disasterRisk.level === 'orange') && state.autoEmergencyAlert) {
+            EmergencyNotificationService.dispatchAutomatedAlert(disasterRisk, city, weatherData, isManglish);
+        }
+
         // Construct live JSON data payload for Gemini/LLM
         const telemetryContext = {
             location: locationDisplay,
@@ -2798,9 +3033,9 @@ A world-class conversational AI meteorologist powered by real-time Open-Meteo Eu
 
         if (intent.type === 'location_details') {
             widgets.push(UIRenderer.createLocationDetailsCard(city, weatherData, disasterRisk, isManglish));
-            widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, isManglish));
+            widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, isManglish, weatherData));
         } else if (intent.type === 'disaster' || disasterRisk.level === 'red' || disasterRisk.level === 'orange') {
-            widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, isManglish));
+            widgets.push(UIRenderer.createDisasterCard(disasterRisk, city, isManglish, weatherData));
         }
 
         widgets.push(UIRenderer.createWeatherHeroCard(city, weatherData, state.units));
@@ -3420,6 +3655,10 @@ function setupSettingsModal() {
     const selectGeminiModel = document.getElementById('select-settings-gemini-model');
     const inputApiKey = document.getElementById('input-api-key');
     const toggleVoice = document.getElementById('toggle-auto-voice');
+    const toggleAutoAlert = document.getElementById('toggle-auto-disaster-alert');
+    const inputEmergencyContacts = document.getElementById('input-emergency-contacts');
+    const inputSmsGatewayUrl = document.getElementById('input-sms-gateway-url');
+    const btnTestAlert = document.getElementById('btn-test-disaster-alert');
 
     if (state.units === 'imperial') {
         unitImperial.classList.add('active');
@@ -3434,14 +3673,46 @@ function setupSettingsModal() {
     if (selectGeminiModel) selectGeminiModel.value = state.geminiModel || 'gemini-3.6-flash';
     inputApiKey.value = state.apiKey;
     toggleVoice.checked = state.autoVoice;
+    if (toggleAutoAlert) toggleAutoAlert.checked = state.autoEmergencyAlert;
+    if (inputEmergencyContacts) inputEmergencyContacts.value = state.emergencyContacts || '';
+    if (inputSmsGatewayUrl) inputSmsGatewayUrl.value = state.smsGatewayUrl || '';
 
     openBtn.addEventListener('click', () => {
         selectProvider.value = state.llmProvider;
         if (selectGeminiModel) selectGeminiModel.value = state.geminiModel || 'gemini-3.6-flash';
         inputApiKey.value = state.apiKey;
+        if (toggleAutoAlert) toggleAutoAlert.checked = state.autoEmergencyAlert;
+        if (inputEmergencyContacts) inputEmergencyContacts.value = state.emergencyContacts || '';
+        if (inputSmsGatewayUrl) inputSmsGatewayUrl.value = state.smsGatewayUrl || '';
         modal.classList.remove('hidden');
     });
     closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+
+    if (btnTestAlert) {
+        btnTestAlert.addEventListener('click', () => {
+            const testCity = state.activeCity || { name: 'Kochi', district: 'Ernakulam', state: 'Kerala', country: 'India' };
+            const testDisaster = {
+                level: 'red',
+                badge: '🔴 RED ALERT',
+                title: 'KSDMA Severe Flash Flood & Landslide Warning',
+                rainSum: 185.0,
+                wind: 68.0,
+                hazards: [
+                    { name: 'Rainfall Rate', value: '185 mm / 24h (Torrential)' },
+                    { name: 'Wind Velocity', value: '68 km/h Gusts' },
+                    { name: 'Soil Saturation', value: 'High Inundation Risk' }
+                ],
+                actions: [
+                    'Evacuate low-lying and riverbank zones immediately to relief camps.',
+                    'Do not venture near swelling rivers, waterfalls, or hilly tracks.',
+                    'Keep phone charged, store drinking water, and contact 112 / 1077.'
+                ]
+            };
+            EmergencyNotificationService.dispatchAutomatedAlert(testDisaster, testCity, null, false);
+            modal.classList.add('hidden');
+            showToast("Test Red Alert broadcast triggered! Emergency banner displayed.");
+        });
+    }
 
     unitMetric.addEventListener('click', () => {
         unitMetric.classList.add('active');
@@ -3481,6 +3752,21 @@ function setupSettingsModal() {
         }
         state.apiKey = inputApiKey.value.trim();
         state.autoVoice = toggleVoice.checked;
+
+        if (toggleAutoAlert) {
+            state.autoEmergencyAlert = toggleAutoAlert.checked;
+            localStorage.setItem('weathergpt_auto_emergency_alert', state.autoEmergencyAlert);
+        }
+        if (inputEmergencyContacts) {
+            state.emergencyContacts = inputEmergencyContacts.value.trim();
+            localStorage.setItem('weathergpt_emergency_contacts', state.emergencyContacts);
+            const broadcastPhone = document.getElementById('broadcast-phone-input');
+            if (broadcastPhone) broadcastPhone.value = state.emergencyContacts;
+        }
+        if (inputSmsGatewayUrl) {
+            state.smsGatewayUrl = inputSmsGatewayUrl.value.trim();
+            localStorage.setItem('weathergpt_sms_gateway_url', state.smsGatewayUrl);
+        }
 
         localStorage.setItem('weathergpt_provider', state.llmProvider);
         localStorage.setItem('weathergpt_apikey', state.apiKey);
@@ -3678,6 +3964,12 @@ function setupDisasterModal() {
     const closeBtn = document.getElementById('btn-close-disaster');
     const refreshBtn = document.getElementById('btn-refresh-disaster');
 
+    const phoneInput = document.getElementById('broadcast-phone-input');
+    const previewTextarea = document.getElementById('broadcast-message-preview');
+    const previewBadge = document.getElementById('broadcast-preview-badge');
+    const btnBroadcastWa = document.getElementById('btn-broadcast-whatsapp');
+    const btnBroadcastSms = document.getElementById('btn-broadcast-sms');
+
     if (!modal) return;
 
     const updateDisasterModalView = async () => {
@@ -3692,6 +3984,10 @@ function setupDisasterModal() {
 
         if (bannerLocation) {
             bannerLocation.textContent = `Active Location: ${city.name} (${Number(city.latitude).toFixed(2)}°N, ${Number(city.longitude).toFixed(2)}°E)`;
+        }
+
+        if (phoneInput && !phoneInput.value) {
+            phoneInput.value = state.emergencyContacts || '';
         }
 
         try {
@@ -3723,10 +4019,28 @@ function setupDisasterModal() {
                 const topHazard = disasterRisk.hazards && disasterRisk.hazards[0] ? `${disasterRisk.hazards[0].name}: ${disasterRisk.hazards[0].value}` : '';
                 bannerDesc.textContent = `${disasterRisk.title}. ${topHazard ? '(' + topHazard + ')' : ''} ${disasterRisk.actions && disasterRisk.actions[0] ? disasterRisk.actions[0] : ''}`;
             }
+
+            // Update Emergency Broadcast Center preview
+            if (previewBadge) {
+                previewBadge.className = `preview-badge badge-${disasterRisk.level}`;
+                previewBadge.textContent = disasterRisk.badge;
+            }
+            if (previewTextarea) {
+                previewTextarea.value = EmergencyNotificationService.formatAlertMessage(disasterRisk, city, forecast, false);
+            }
         } catch (err) {
             console.warn("Disaster status evaluation error:", err);
             if (bannerDesc) {
                 bannerDesc.textContent = "Live telemetry active. Safe atmospheric baseline observed.";
+            }
+            if (previewTextarea && !previewTextarea.value) {
+                previewTextarea.value = EmergencyNotificationService.formatAlertMessage({
+                    level: 'green',
+                    badge: '🟢 NORMAL BASELINE',
+                    title: 'Normal Baseline Observed',
+                    hazards: [],
+                    actions: ['No severe meteorological alerts active for current region.']
+                }, city, null, false);
             }
         }
 
@@ -3765,6 +4079,39 @@ function setupDisasterModal() {
             }
         }
     };
+
+    if (phoneInput) {
+        phoneInput.addEventListener('change', () => {
+            state.emergencyContacts = phoneInput.value.trim();
+            localStorage.setItem('weathergpt_emergency_contacts', state.emergencyContacts);
+            const settingsPhone = document.getElementById('input-emergency-contacts');
+            if (settingsPhone) settingsPhone.value = state.emergencyContacts;
+        });
+    }
+
+    if (btnBroadcastWa) {
+        btnBroadcastWa.addEventListener('click', () => {
+            const text = previewTextarea ? previewTextarea.value : '';
+            const phone = phoneInput ? phoneInput.value.trim() : '';
+            if (!text) {
+                showToast("Loading alert data, please wait...");
+                return;
+            }
+            EmergencyNotificationService.shareWhatsApp(text, phone);
+        });
+    }
+
+    if (btnBroadcastSms) {
+        btnBroadcastSms.addEventListener('click', () => {
+            const text = previewTextarea ? previewTextarea.value : '';
+            const phone = phoneInput ? phoneInput.value.trim() : '';
+            if (!text) {
+                showToast("Loading alert data, please wait...");
+                return;
+            }
+            EmergencyNotificationService.sendSms(text, phone);
+        });
+    }
 
     if (openBtn) {
         openBtn.addEventListener('click', () => {
